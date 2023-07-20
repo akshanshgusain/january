@@ -1,5 +1,10 @@
 package january
 
+import (
+	"fmt"
+	"github.com/joho/godotenv"
+)
+
 const version = "1.0.0"
 
 type January struct {
@@ -18,6 +23,14 @@ func (j *January) New(rootPath string) error {
 		return err
 	}
 
+	if err := j.checkDotEnv(rootPath); err != nil {
+		return err
+	}
+	// reading .env with extern lib: joho/godotenv
+	if err := godotenv.Load(rootPath + "/.env"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -32,6 +45,13 @@ func (j *January) Init(p initPaths) error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (j *January) checkDotEnv(p string) error {
+	if err := j.CreateFileIfNotExist(fmt.Sprintf("%s/.env", p)); err != nil {
+		return err
 	}
 	return nil
 }
