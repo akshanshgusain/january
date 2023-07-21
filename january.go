@@ -3,14 +3,20 @@ package january
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"log"
+	"os"
+	"strconv"
 )
 
 const version = "1.0.0"
 
 type January struct {
-	AppName string
-	Debug   bool
-	Version string
+	AppName  string
+	Debug    bool
+	Version  string
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
+	RootPath string
 }
 
 func (j *January) New(rootPath string) error {
@@ -30,6 +36,13 @@ func (j *January) New(rootPath string) error {
 	if err := godotenv.Load(rootPath + "/.env"); err != nil {
 		return err
 	}
+	j.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+	j.Version = version
+
+	// create loggers
+	infoLog, errorLog := j.startLoggers()
+	j.ErrorLog = errorLog
+	j.InfoLog = infoLog
 
 	return nil
 }
@@ -38,7 +51,6 @@ func (j *January) Init(p initPaths) error {
 	// root path of web app
 	root := p.rootPath
 
-	// TODO: get a list of all folder at the root path, create them if not exist
 	for _, path := range p.folderNames {
 		// create the folder if not present
 		err := j.CreateDirIfNotExist(root + "/" + path)
@@ -54,4 +66,11 @@ func (j *January) checkDotEnv(p string) error {
 		return err
 	}
 	return nil
+}
+
+func (j *January) startLoggers() (*log.Logger, *log.Logger) {
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	return infoLog, errorLog
 }
