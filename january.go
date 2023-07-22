@@ -17,6 +17,12 @@ type January struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	config   configuration
+}
+
+type configuration struct {
+	port           string
+	templateEngine string
 }
 
 func (j *January) New(rootPath string) error {
@@ -38,12 +44,18 @@ func (j *January) New(rootPath string) error {
 	}
 	j.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	j.Version = version
+	j.RootPath = rootPath
 
 	// create loggers
 	infoLog, errorLog := j.startLoggers()
 	j.ErrorLog = errorLog
 	j.InfoLog = infoLog
 
+	// configuration
+	j.config = configuration{
+		port:           os.Getenv("PORT"),
+		templateEngine: os.Getenv("TEMPLATE_ENGINE"),
+	}
 	return nil
 }
 
