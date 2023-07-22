@@ -2,10 +2,13 @@ package january
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 const version = "1.0.0"
@@ -17,6 +20,7 @@ type January struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	Routes   *chi.Mux
 	config   configuration
 }
 
@@ -56,6 +60,10 @@ func (j *January) New(rootPath string) error {
 		port:           os.Getenv("PORT"),
 		templateEngine: os.Getenv("TEMPLATE_ENGINE"),
 	}
+
+	// add routes
+	j.Routes = j.routes().(*chi.Mux)
+
 	return nil
 }
 
@@ -85,4 +93,21 @@ func (j *January) startLoggers() (*log.Logger, *log.Logger) {
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return infoLog, errorLog
+}
+
+func (j *January) RunServer() {
+	s := &http.Server{
+		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
+		ErrorLog:     j.ErrorLog,
+		Handler:      j.routes(),
+		IdleTimeout:  30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+	}
+	j.InfoLog.Printf("Starting January server at http://127.0.0.1:%s", os.Getenv("PORT"))
+	j.InfoLog.Printf("Quit the server with control+c")
+	if err := s.ListenAndServe(); err != nil {
+		j.ErrorLog.Fatal(err)
+	}
+
 }
