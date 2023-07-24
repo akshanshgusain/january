@@ -26,7 +26,7 @@ type TemplateData struct {
 	Secure          bool
 }
 
-func (t *TemplateEngine) Page(w http.ResponseWriter, r *http.ResponseWriter, view string, variables, data interface{}) error {
+func (t *TemplateEngine) Page(w http.ResponseWriter, r *http.Request, view string, variables, data interface{}) error {
 	switch t.TemplateEngine {
 	case "go":
 		return t.GoPage(w, r, view, variables, data)
@@ -35,7 +35,7 @@ func (t *TemplateEngine) Page(w http.ResponseWriter, r *http.ResponseWriter, vie
 	return nil
 }
 
-func (t *TemplateEngine) GoPage(w http.ResponseWriter, r *http.ResponseWriter, view string, variables, data interface{}) error {
+func (t *TemplateEngine) GoPage(w http.ResponseWriter, r *http.Request, view string, variables, data interface{}) error {
 	tmpl, err := template.ParseFiles(fmt.Sprintf("%s/views/%s.page.tmpl", t.RootPath, view))
 	if err != nil {
 		return err
