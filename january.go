@@ -66,7 +66,7 @@ func (j *January) New(rootPath string) error {
 	j.Routes = j.routes().(*chi.Mux)
 
 	// add Template Engine
-	j.TemplateEngine = j.createTemplateEngine()
+	j.createTemplateEngine()
 
 	return nil
 }
@@ -99,13 +99,12 @@ func (j *January) startLoggers() (*log.Logger, *log.Logger) {
 	return infoLog, errorLog
 }
 
-func (j *January) createTemplateEngine() *TemplateEngine {
-	te := TemplateEngine{
+func (j *January) createTemplateEngine() {
+	j.TemplateEngine = &TemplateEngine{
 		TemplateEngine: j.config.templateEngine,
 		RootPath:       j.RootPath,
 		Port:           j.config.port,
 	}
-	return &te
 }
 
 func (j *January) RunServer() {
@@ -117,7 +116,7 @@ func (j *January) RunServer() {
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
-	j.InfoLog.Printf("Starting January server at http://127.0.0.1:%s", os.Getenv("PORT"))
+	j.InfoLog.Printf("Starting January server at http://127.0.0.1:%s/", os.Getenv("PORT"))
 	j.InfoLog.Printf("Quit the server with control+c")
 	if err := s.ListenAndServe(); err != nil {
 		j.ErrorLog.Fatal(err)
