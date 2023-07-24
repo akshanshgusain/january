@@ -14,14 +14,15 @@ import (
 const version = "1.0.0"
 
 type January struct {
-	AppName  string
-	Debug    bool
-	Version  string
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-	RootPath string
-	Routes   *chi.Mux
-	config   configuration
+	AppName        string
+	Debug          bool
+	Version        string
+	ErrorLog       *log.Logger
+	InfoLog        *log.Logger
+	RootPath       string
+	Routes         *chi.Mux
+	TemplateEngine *TemplateEngine
+	config         configuration
 }
 
 type configuration struct {
@@ -64,6 +65,9 @@ func (j *January) New(rootPath string) error {
 	// add routes
 	j.Routes = j.routes().(*chi.Mux)
 
+	// add Template Engine
+	j.TemplateEngine = j.createTemplateEngine()
+
 	return nil
 }
 
@@ -93,6 +97,15 @@ func (j *January) startLoggers() (*log.Logger, *log.Logger) {
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return infoLog, errorLog
+}
+
+func (j *January) createTemplateEngine() *TemplateEngine {
+	te := TemplateEngine{
+		TemplateEngine: j.config.templateEngine,
+		RootPath:       j.RootPath,
+		Port:           j.config.port,
+	}
+	return &te
 }
 
 func (j *January) RunServer() {
