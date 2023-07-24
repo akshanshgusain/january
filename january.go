@@ -99,7 +99,7 @@ func (j *January) RunServer() {
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		ErrorLog:     j.ErrorLog,
-		Handler:      j.routes(),
+		Handler:      j.Routes,
 		IdleTimeout:  30 * time.Second,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
