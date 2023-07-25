@@ -2,6 +2,7 @@ package january
 
 import (
 	"fmt"
+	"github.com/CloudyKit/jet/v6"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"log"
@@ -22,6 +23,7 @@ type January struct {
 	RootPath       string
 	Routes         *chi.Mux
 	TemplateEngine *TemplateEngine
+	JetViews       *jet.Set
 	config         configuration
 }
 
