@@ -2,6 +2,7 @@ package january
 
 import (
 	"fmt"
+	"github.com/CloudyKit/jet/v6"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"log"
@@ -22,6 +23,7 @@ type January struct {
 	RootPath       string
 	Routes         *chi.Mux
 	TemplateEngine *TemplateEngine
+	JetViews       *jet.Set
 	config         configuration
 }
 
@@ -68,6 +70,12 @@ func (j *January) New(rootPath string) error {
 	// add Template Engine
 	j.createTemplateEngine()
 
+	// jet views
+	j.JetViews = jet.NewSet(
+		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+		jet.InDevelopmentMode(),
+	)
+
 	return nil
 }
 
@@ -104,6 +112,7 @@ func (j *January) createTemplateEngine() {
 		TemplateEngine: j.config.templateEngine,
 		RootPath:       j.RootPath,
 		Port:           j.config.port,
+		JetViews:       j.JetViews,
 	}
 }
 
