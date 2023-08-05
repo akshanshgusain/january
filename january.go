@@ -75,6 +75,16 @@ func (j *January) New(rootPath string) error {
 		sessionType: os.Getenv("SESSION_TYPE"),
 	}
 
+	// create session
+	s := Session{
+		CookieLifetime: j.config.cookie.lifetime,
+		CookiePersist:  j.config.cookie.persist,
+		CookieName:     j.config.cookie.name,
+		SessionType:    j.config.sessionType,
+	}
+
+	j.Session = s.InitSession()
+
 	// add routes
 	j.Routes = j.routes().(*chi.Mux)
 
