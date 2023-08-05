@@ -70,6 +70,7 @@ func (j *January) New(rootPath string) error {
 			name:     os.Getenv("COOKIE_NAME"),
 			lifetime: os.Getenv("COOKIE_LIFETIME"),
 			persist:  os.Getenv("COOKIE_PERSIST"),
+			secure:   os.Getenv("COOKIE_SECURE"),
 		},
 		sessionType: os.Getenv("SESSION_TYPE"),
 	}
