@@ -3,6 +3,7 @@ package january
 import (
 	"fmt"
 	"github.com/CloudyKit/jet/v6"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"log"
@@ -23,6 +24,7 @@ type January struct {
 	RootPath       string
 	Routes         *chi.Mux
 	TemplateEngine *TemplateEngine
+	Session        *scs.SessionManager
 	JetViews       *jet.Set
 	config         configuration
 }
@@ -30,6 +32,8 @@ type January struct {
 type configuration struct {
 	port           string
 	templateEngine string
+	cookie         cookieConfig
+	sessionType    string
 }
 
 func (j *January) New(rootPath string) error {
@@ -62,7 +66,24 @@ func (j *January) New(rootPath string) error {
 	j.config = configuration{
 		port:           os.Getenv("PORT"),
 		templateEngine: os.Getenv("TEMPLATE_ENGINE"),
+		cookie: cookieConfig{
+			name:     os.Getenv("COOKIE_NAME"),
+			lifetime: os.Getenv("COOKIE_LIFETIME"),
+			persist:  os.Getenv("COOKIE_PERSIST"),
+			secure:   os.Getenv("COOKIE_SECURE"),
+		},
+		sessionType: os.Getenv("SESSION_TYPE"),
 	}
+
+	// create session
+	s := Session{
+		CookieLifetime: j.config.cookie.lifetime,
+		CookiePersist:  j.config.cookie.persist,
+		CookieName:     j.config.cookie.name,
+		SessionType:    j.config.sessionType,
+	}
+
+	j.Session = s.InitSession()
 
 	// add routes
 	j.Routes = j.routes().(*chi.Mux)
