@@ -71,6 +71,7 @@ func (j *January) New(rootPath string) error {
 			lifetime: os.Getenv("COOKIE_LIFETIME"),
 			persist:  os.Getenv("COOKIE_PERSIST"),
 			secure:   os.Getenv("COOKIE_SECURE"),
+			domain:   os.Getenv("COOKIE_DOMAIN"),
 		},
 		sessionType: os.Getenv("SESSION_TYPE"),
 	}
@@ -81,6 +82,7 @@ func (j *January) New(rootPath string) error {
 		CookiePersist:  j.config.cookie.persist,
 		CookieName:     j.config.cookie.name,
 		SessionType:    j.config.sessionType,
+		CookieDomain:   j.config.cookie.domain,
 	}
 
 	j.Session = s.InitSession()
