@@ -82,6 +82,7 @@ func (j *January) New(rootPath string) error {
 		CookiePersist:  j.config.cookie.persist,
 		CookieName:     j.config.cookie.name,
 		SessionType:    j.config.sessionType,
+		CookieDomain:   j.config.cookie.domain,
 	}
 
 	j.Session = s.InitSession()
