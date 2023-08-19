@@ -91,6 +91,10 @@ func (j *January) New(rootPath string) error {
 			domain:   os.Getenv("COOKIE_DOMAIN"),
 		},
 		sessionType: os.Getenv("SESSION_TYPE"),
+		database: databaseConfig{
+			database: os.Getenv("DATABASE_TYPE"),
+			dsn:      j.BuildDSN(),
+		},
 	}
 
 	// create session
