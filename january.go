@@ -25,6 +25,7 @@ type January struct {
 	Routes         *chi.Mux
 	TemplateEngine *TemplateEngine
 	Session        *scs.SessionManager
+	DB             Database
 	JetViews       *jet.Set
 	config         configuration
 }
@@ -34,6 +35,7 @@ type configuration struct {
 	templateEngine string
 	cookie         cookieConfig
 	sessionType    string
+	database       databaseConfig
 }
 
 func (j *January) New(rootPath string) error {
@@ -45,6 +47,8 @@ func (j *January) New(rootPath string) error {
 	if err := j.Init(pathConfig); err != nil {
 		return err
 	}
+
+	// TODO: add a bette way to do sanity check
 
 	if err := j.checkDotEnv(rootPath); err != nil {
 		return err
@@ -61,6 +65,19 @@ func (j *January) New(rootPath string) error {
 	infoLog, errorLog := j.startLoggers()
 	j.ErrorLog = errorLog
 	j.InfoLog = infoLog
+
+	// connect to database
+	if os.Getenv("DATABASE_TYPE") != "" {
+		db, err := j.OpenDBConnection(os.Getenv("DATABASE_TYPE"), j.BuildDSN())
+		if err != nil {
+			errorLog.Println(err)
+			os.Exit(1)
+		}
+		j.DB = Database{
+			DataType: os.Getenv("DATABASE_TYPE"),
+			Pool:     db,
+		}
+	}
 
 	// configuration
 	j.config = configuration{
@@ -154,4 +171,25 @@ func (j *January) RunServer() {
 		j.ErrorLog.Fatal(err)
 	}
 
+}
+
+func (j *January) BuildDSN() string {
+	var dsn string
+	switch os.Getenv("DATABASE_TYPE") {
+	case "postgres", "postgresql":
+		dsn = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=%s timezone=UTC connect_timeout=5",
+			os.Getenv("DATABASE_HOST"),
+			os.Getenv("DATABASE_PORT"),
+			os.Getenv("DATABASE_USER"),
+			os.Getenv("DATABASE_NAME"),
+			os.Getenv("DATABASE_SSL_MODE"))
+		if os.Getenv("DATABASE_PASS") != "" {
+			dsn = fmt.Sprintf("%s password=%s",
+				dsn,
+				os.Getenv("DATABASE_PASS"))
+		}
+	default:
+	}
+
+	return dsn
 }
