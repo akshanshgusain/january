@@ -1,6 +1,9 @@
 package january
 
-import "database/sql"
+import (
+	"database/sql"
+	_ "github.com/jackc/pgx/v5/stdlib"
+)
 
 func (j *January) OpenDBConnection(dbType, dsn string) (*sql.DB, error) {
 	if dbType == "postgres" || dbType == "postgresql" {
