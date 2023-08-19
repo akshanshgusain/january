@@ -1,6 +1,7 @@
 package january
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
@@ -169,6 +170,15 @@ func (j *January) RunServer() {
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
+
+	// TODO: close db connection
+	defer func(Pool *sql.DB) {
+		err := Pool.Close()
+		if err != nil {
+			j.ErrorLog.Fatal(err)
+		}
+	}(j.DB.Pool)
+
 	j.InfoLog.Printf("Starting January server at http://127.0.0.1:%s/", os.Getenv("PORT"))
 	j.InfoLog.Printf("Quit the server with control+c")
 	if err := s.ListenAndServe(); err != nil {
