@@ -2,7 +2,9 @@ package january
 
 import (
 	"database/sql"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jackc/pgconn"
+	_ "github.com/jackc/pgx/v4"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 func (j *January) OpenDBConnection(dbType, dsn string) (*sql.DB, error) {
