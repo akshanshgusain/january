@@ -158,6 +158,7 @@ func (j *January) createTemplateEngine() {
 		RootPath:       j.RootPath,
 		Port:           j.config.port,
 		JetViews:       j.JetViews,
+		Session:        j.Session,
 	}
 }
 
