@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/CloudyKit/jet/v6"
+	"github.com/alexedwards/scs/v2"
 	"html/template"
 	"log"
 	"net/http"
@@ -16,6 +17,7 @@ type TemplateEngine struct {
 	Port           string
 	ServerName     string
 	JetViews       *jet.Set
+	Session        *scs.SessionManager
 }
 
 type TemplateData struct {
@@ -28,6 +30,17 @@ type TemplateData struct {
 	Port            string
 	ServerName      string
 	Secure          bool
+}
+
+func (t *TemplateEngine) defaultData(td *TemplateData, r *http.Request) *TemplateData {
+	td.Secure = t.Secure
+	td.ServerName = t.ServerName
+	td.Port = t.Port
+
+	if t.Session.Exists(r.Context(), "userID") {
+		td.IsAuthenticated = true
+	}
+	return td
 }
 
 func (t *TemplateEngine) Page(w http.ResponseWriter, r *http.Request, view string, variables, data interface{}) error {
@@ -69,6 +82,8 @@ func (t *TemplateEngine) JetPage(w http.ResponseWriter, r *http.Request, templat
 	if data != nil {
 		td = data.(*TemplateData)
 	}
+
+	td = t.defaultData(td, r)
 
 	tmpl, err := t.JetViews.GetTemplate(fmt.Sprintf("%s.jet", templateName))
 	if err != nil {
