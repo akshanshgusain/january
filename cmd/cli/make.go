@@ -20,8 +20,15 @@ func doMake(arg2, arg3 string) error {
 		//	TODO: templates for migrations
 
 		// up migration
-
+		err := copyFileFromTemplate("templates/migrations/migration."+dbType+".up.sql", upFile)
+		if err != nil {
+			exitGracefully(err)
+		}
 		// down migration
+		err = copyFileFromTemplate("templates/migrations/migration."+dbType+".down.sql", downFile)
+		if err != nil {
+			exitGracefully(err)
+		}
 	}
 	return nil
 }
