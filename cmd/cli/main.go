@@ -18,6 +18,8 @@ func main() {
 		exitGracefully(err)
 	}
 
+	setup()
+
 	switch arg1 {
 	case "help":
 		showHelp()
@@ -25,11 +27,11 @@ func main() {
 		color.Yellow("Application version: " + version)
 	case "make":
 		if arg2 == "" {
-			exitGracefully(errors.New("make requires a subcommand: migration|model|handler"))
-			err = doMake(arg2, arg3)
-			if err != nil {
-				exitGracefully(err)
-			}
+			exitGracefully(errors.New("make requires a subcommand: (migration|model|handler)"))
+		}
+		err = doMake(arg2, arg3)
+		if err != nil {
+			exitGracefully(err)
 		}
 	default:
 		log.Println(arg2, arg3)
@@ -41,11 +43,12 @@ func validateInput() (string, string, string, error) {
 
 	if len(os.Args) > 1 {
 		arg1 = os.Args[1]
-		if len(os.Args) > 3 {
+
+		if len(os.Args) > 2 {
 			arg2 = os.Args[2]
 		}
 
-		if len(os.Args) > 4 {
+		if len(os.Args) > 3 {
 			arg3 = os.Args[3]
 		}
 	} else {
