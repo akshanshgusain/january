@@ -9,3 +9,6 @@ cover:
 ## coverage: displays test coverage
 coverage:
 	@go test -cover ./...
+
+build_cli:
+	@go build -o ../januaryApp/january ./cmd/cli
