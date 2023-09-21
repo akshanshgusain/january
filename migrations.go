@@ -55,3 +55,17 @@ func (j *January) MigrationForce(dsn string) error {
 	}
 	return nil
 }
+
+func (j *January) MigrateDownAll(dsn string) error {
+	m, err := migrate.New("file://"+j.RootPath+"/migrations", dsn)
+	if err != nil {
+		return err
+	}
+	defer m.Close()
+
+	if err := m.Down(); err != nil {
+		return err
+	}
+
+	return nil
+}
