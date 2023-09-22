@@ -13,7 +13,7 @@ func doMake(arg2, arg3 string) error {
 		if arg3 == "" {
 			exitGracefully(errors.New("you must give this migration a name"))
 		}
-		fileName := fmt.Sprintf("%d %s", time.Now().UnixMicro(), arg3)
+		fileName := fmt.Sprintf("%d_%s", time.Now().UnixMicro(), arg3)
 		upFile := j.RootPath + "/migrations/" + fileName + "." + dbType + ".up.sql"
 		downFile := j.RootPath + "/migrations/" + fileName + "." + dbType + ".down.sql"
 
