@@ -70,25 +70,3 @@ func validateInput() (string, string, string, error) {
 
 	return arg1, arg2, arg3, nil
 }
-
-func showHelp() {
-	color.Yellow(`Available commands: 
-	help		-	show the help commands
-	version		-	print application version`)
-}
-
-func exitGracefully(e error, msg ...string) {
-	message := ""
-	if len(msg) > 0 {
-		message = msg[0]
-	}
-	if e != nil {
-		color.Red("Error: %v\n", e)
-	}
-	if len(message) > 0 {
-		color.Yellow(message)
-	} else {
-		color.Green("Finished!")
-	}
-	os.Exit(0)
-}
