@@ -37,8 +37,5 @@ func doAuth() error {
 	if err != nil {
 		exitGracefully(err)
 	}
-
 	return nil
 }
-
-// print([item for item in my_list if item!=20])
