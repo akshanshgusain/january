@@ -15,6 +15,11 @@ require (
 
 require (
 	github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53 // indirect
+	github.com/alexedwards/scs/mysqlstore v0.0.0-20230902070821-95fa2ac9d520 // indirect
+	github.com/alexedwards/scs/postgresstore v0.0.0-20230902070821-95fa2ac9d520 // indirect
+	github.com/alexedwards/scs/redisstore v0.0.0-20230902070821-95fa2ac9d520 // indirect
+	github.com/gertd/go-pluralize v0.2.1 // indirect
+	github.com/gomodule/redigo v1.8.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect

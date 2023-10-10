@@ -105,6 +105,7 @@ func (j *January) New(rootPath string) error {
 		CookieName:     j.config.cookie.name,
 		SessionType:    j.config.sessionType,
 		CookieDomain:   j.config.cookie.domain,
+		DBPool:         j.DB.Pool,
 	}
 
 	j.Session = s.InitSession()
