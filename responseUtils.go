@@ -53,7 +53,7 @@ func (j *January) WriteXML(w http.ResponseWriter, status int, data interface{}, 
 	return nil
 }
 
-func (j *January) DownloadFile(w http.ResponseWriter, pathToFile, filename string) error {
+func (j *January) DownloadFile(w http.ResponseWriter, r *http.Request, pathToFile, filename string) error {
 	fp := path.Join(pathToFile, filename)
 	fileToServer := filepath.Clean(fp)
 	w.Header().Set("Content-Type", fmt.Sprintf("attachment; file=\"%s\"", filename))
