@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/gertd/go-pluralize"
 	"github.com/iancoleman/strcase"
 	"io/ioutil"
@@ -104,6 +105,10 @@ func doMake(arg2, arg3 string) error {
 		if err != nil {
 			exitGracefully(err)
 		}
+
+	case "key":
+		rnd := j.RandomString(32)
+		color.Yellow("32 character encryption key: %s", rnd)
 	}
 	return nil
 }
