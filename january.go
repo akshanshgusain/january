@@ -29,6 +29,7 @@ type January struct {
 	DB             Database
 	JetViews       *jet.Set
 	config         configuration
+	EncryptionKey  string
 }
 
 type configuration struct {
@@ -109,6 +110,7 @@ func (j *January) New(rootPath string) error {
 	}
 
 	j.Session = s.InitSession()
+	j.EncryptionKey = os.Getenv("KEY")
 
 	// add routes
 	j.Routes = j.routes().(*chi.Mux)
