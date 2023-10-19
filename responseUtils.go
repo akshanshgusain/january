@@ -56,7 +56,8 @@ func (j *January) WriteXML(w http.ResponseWriter, status int, data interface{}, 
 func (j *January) DownloadFile(w http.ResponseWriter, r *http.Request, pathToFile, filename string) error {
 	fp := path.Join(pathToFile, filename)
 	fileToServer := filepath.Clean(fp)
-	w.Header().Set("Content-Type", fmt.Sprintf("attachment; file=\"%s\"", filename))
+	//w.Header().Set("Content-Type", fmt.Sprintf("attachment; file=\"%s\"", filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; file=\"%s\"", filename))
 	http.ServeFile(w, r, fileToServer)
 	return nil
 }
