@@ -56,25 +56,25 @@ func (c *RedisCache) Get(str string) (interface{}, error) {
 	return decoded[k], nil
 }
 
-func (c *RedisCache) Set(str string, data interface{}, ttl ...int) error {
-	k := fmt.Sprintf("%s:%s", c.Prefix, str)
+func (c *RedisCache) Set(str string, value interface{}, expires ...int) error {
+	key := fmt.Sprintf("%s:%s", c.Prefix, str)
 	conn := c.Conn.Get()
 	defer conn.Close()
 
 	entry := Entry{}
-	entry[k] = data
+	entry[key] = value
 	encoded, err := encode(entry)
 	if err != nil {
 		return err
 	}
 
-	if len(ttl) > 0 {
-		_, err := conn.Do("SETEX", k, ttl[0], string(encoded))
+	if len(expires) > 0 {
+		_, err := conn.Do("SETEX", key, expires[0], string(encoded))
 		if err != nil {
 			return err
 		}
 	} else {
-		_, err := conn.Do("SET", k, string(encoded))
+		_, err := conn.Do("SET", key, string(encoded))
 		if err != nil {
 			return err
 		}

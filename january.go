@@ -64,11 +64,6 @@ func (j *January) New(rootPath string) error {
 		return err
 	}
 
-	if os.Getenv("CACHE") == "redis" {
-		myRedisCache := j.createClientRedisCache()
-		j.Cache = myRedisCache
-	}
-
 	j.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	j.Version = version
 	j.RootPath = rootPath
@@ -77,6 +72,11 @@ func (j *January) New(rootPath string) error {
 	infoLog, errorLog := j.startLoggers()
 	j.ErrorLog = errorLog
 	j.InfoLog = infoLog
+
+	if os.Getenv("CACHE") == "redis" {
+		myRedisCache := j.createClientRedisCache()
+		j.Cache = myRedisCache
+	}
 
 	// connect to database
 	if os.Getenv("DATABASE_TYPE") != "" {
