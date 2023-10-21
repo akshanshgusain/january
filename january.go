@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/CloudyKit/jet/v6"
+	"github.com/akshanshgusain/january/cache"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
+	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -30,6 +32,7 @@ type January struct {
 	JetViews       *jet.Set
 	config         configuration
 	EncryptionKey  string
+	Cache          cache.Cache
 }
 
 type configuration struct {
@@ -38,6 +41,7 @@ type configuration struct {
 	cookie         cookieConfig
 	sessionType    string
 	database       databaseConfig
+	redis          redisConfig
 }
 
 func (j *January) New(rootPath string) error {
@@ -59,6 +63,12 @@ func (j *January) New(rootPath string) error {
 	if err := godotenv.Load(rootPath + "/.env"); err != nil {
 		return err
 	}
+
+	if os.Getenv("CACHE") == "redis" {
+		myRedisCache := j.createClientRedisCache()
+		j.Cache = myRedisCache
+	}
+
 	j.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	j.Version = version
 	j.RootPath = rootPath
@@ -96,6 +106,11 @@ func (j *January) New(rootPath string) error {
 		database: databaseConfig{
 			database: os.Getenv("DATABASE_TYPE"),
 			dsn:      j.BuildDSN(),
+		},
+		redis: redisConfig{
+			host:     os.Getenv("REDIS_HOST"),
+			password: os.Getenv("REDIS_PASSWORD"),
+			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
 	}
 
@@ -210,4 +225,35 @@ func (j *January) BuildDSN() string {
 	}
 
 	return dsn
+}
+
+func (j *January) createRedisPool() *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     50,
+		MaxActive:   10000,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp",
+				j.config.redis.host,
+				redis.DialPassword(j.config.redis.password),
+			)
+		},
+
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+}
+
+func (j *January) createClientRedisCache() *cache.RedisCache {
+	cacheClient := cache.RedisCache{
+		Conn:   j.createRedisPool(),
+		Prefix: j.config.redis.prefix,
+	}
+
+	return &cacheClient
 }
