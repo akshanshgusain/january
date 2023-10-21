@@ -18,6 +18,8 @@ import (
 
 const version = "1.0.0"
 
+var myRedisCache *cache.RedisCache
+
 type January struct {
 	AppName        string
 	Debug          bool
@@ -73,8 +75,9 @@ func (j *January) New(rootPath string) error {
 	j.ErrorLog = errorLog
 	j.InfoLog = infoLog
 
-	if os.Getenv("CACHE") == "redis" {
-		myRedisCache := j.createClientRedisCache()
+	// check if redis is available
+	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
+		myRedisCache = j.createClientRedisCache()
 		j.Cache = myRedisCache
 	}
 
@@ -121,7 +124,14 @@ func (j *January) New(rootPath string) error {
 		CookieName:     j.config.cookie.name,
 		SessionType:    j.config.sessionType,
 		CookieDomain:   j.config.cookie.domain,
-		DBPool:         j.DB.Pool,
+	}
+
+	// switch session storage
+	switch j.config.sessionType {
+	case "redis":
+		s.RedisPool = myRedisCache.Conn
+	case "mysql", "postgres", "mariadb", "postgresql":
+		s.DBPool = j.DB.Pool
 	}
 
 	j.Session = s.InitSession()
