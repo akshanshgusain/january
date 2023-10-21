@@ -6,6 +6,11 @@ import (
 	"testing"
 )
 
+/*
+When you run your tests using the go test command, it will discover and execute the test functions in the package,
+and the TestMain function will be called before and after the tests, as specified in your code.
+*/
+
 // jet views
 var jv = jet.NewSet(
 	jet.NewOSFileSystemLoader("./testData/views"),
