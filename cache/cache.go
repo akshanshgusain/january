@@ -95,17 +95,17 @@ func (c *RedisCache) Forget(str string) error {
 }
 
 func (c *RedisCache) EmptyByMatch(str string) error {
-	k := fmt.Sprintf("%s:%s", c.Prefix, str)
+	key := fmt.Sprintf("%s:%s", c.Prefix, str)
 	conn := c.Conn.Get()
 	defer conn.Close()
 
-	keys, err := c.getKeys(k)
+	keys, err := c.getKeys(key)
 	if err != nil {
 		return err
 	}
 
 	for _, x := range keys {
-		err := c.Forget(x)
+		_, err := conn.Do("DEL", x)
 		if err != nil {
 			return err
 		}
@@ -115,27 +115,20 @@ func (c *RedisCache) EmptyByMatch(str string) error {
 }
 
 func (c *RedisCache) Empty() error {
-	//k := fmt.Sprintf("%s:%s", c.Prefix, c.Prefix)
-	//conn := c.Conn.Get()
-	//defer conn.Close()
-	//
-	//keys, err := c.getKeys(k)
-	//
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//for _, x := range keys {
-	//	err = c.Forget(x)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
+	key := fmt.Sprintf("%s:", c.Prefix)
+	conn := c.Conn.Get()
+	defer conn.Close()
 
-	// empty all keys with the prefix
-	err := c.EmptyByMatch(c.Prefix)
+	keys, err := c.getKeys(key)
 	if err != nil {
 		return err
+	}
+
+	for _, x := range keys {
+		_, err := conn.Do("DEL", x)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
