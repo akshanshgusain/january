@@ -12,3 +12,9 @@ coverage:
 
 build_cli:
 	@go build -o ../januaryApp/january ./cmd/cli
+
+count:
+	 find . -type f -name '*.go' | xargs cat | wc -l
+
+count_all:
+	 find . -type f \( -name '*.go' -o -name '*.yaml' -o -name '*.jet' -o -name '*.txt' -o -name '*.sql' \) | xargs cat | wc -l
