@@ -14,6 +14,8 @@ func (j *January) routes() http.Handler {
 		mux.Use(middleware.Logger)
 	}
 	mux.Use(middleware.Recoverer)
+	mux.Use(j.JanuaryCSRF)
 	mux.Use(j.LoadSession)
+
 	return mux
 }

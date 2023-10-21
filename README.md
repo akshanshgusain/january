@@ -21,5 +21,4 @@ January is Batteries-Included Go Framework inspired by Django. Designed to ease 
 * CSRF protection
 * Encryption
 * Multiple Caching backends
-* And much more
 
