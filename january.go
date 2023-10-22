@@ -141,10 +141,16 @@ func (j *January) New(rootPath string) error {
 	j.Routes = j.routes().(*chi.Mux)
 
 	// jet views
-	j.JetViews = jet.NewSet(
-		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
-		jet.InDevelopmentMode(),
-	)
+	if j.Debug {
+		j.JetViews = jet.NewSet(
+			jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+			jet.InDevelopmentMode(),
+		)
+	} else {
+		j.JetViews = jet.NewSet(
+			jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+		)
+	}
 
 	// add Template Engine
 	j.createTemplateEngine()
