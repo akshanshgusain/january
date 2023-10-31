@@ -6,9 +6,11 @@ import (
 	"github.com/CloudyKit/jet/v6"
 	"github.com/akshanshgusain/january/cache"
 	"github.com/alexedwards/scs/v2"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +21,9 @@ import (
 const version = "1.0.0"
 
 var myRedisCache *cache.RedisCache
+var myBadgerCache *cache.BadgerCache
+var redisPool *redis.Pool
+var badgerConn *badger.DB
 
 type January struct {
 	AppName        string
@@ -35,6 +40,7 @@ type January struct {
 	config         configuration
 	EncryptionKey  string
 	Cache          cache.Cache
+	Scheduler      *cron.Cron
 }
 
 type configuration struct {
@@ -79,6 +85,26 @@ func (j *January) New(rootPath string) error {
 	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
 		myRedisCache = j.createClientRedisCache()
 		j.Cache = myRedisCache
+		redisPool = myRedisCache.Conn
+	}
+
+	// set scheduler
+	scheduler := cron.New()
+	j.Scheduler = scheduler
+
+	// check if badger is available
+	if os.Getenv("CACHE") == "badger" {
+		myBadgerCache = j.createClientBadgerCache()
+		j.Cache = myBadgerCache
+		badgerConn = myBadgerCache.Conn
+
+		// garbage collection/clean up
+		_, err := j.Scheduler.AddFunc("@daily", func() {
+			_ = myBadgerCache.Conn.RunValueLogGC(0.7)
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	// connect to database
@@ -214,6 +240,20 @@ func (j *January) RunServer() {
 		}
 	}(j.DB.Pool)
 
+	defer func(redisPool *redis.Pool) {
+		err := redisPool.Close()
+		if err != nil {
+
+		}
+	}(redisPool)
+
+	defer func(badgerConn *badger.DB) {
+		err := badgerConn.Close()
+		if err != nil {
+
+		}
+	}(badgerConn)
+
 	j.InfoLog.Printf("Starting January server at http://127.0.0.1:%s/", os.Getenv("PORT"))
 	j.InfoLog.Printf("Quit the server with control+c")
 	if err := s.ListenAndServe(); err != nil {
@@ -269,6 +309,22 @@ func (j *January) createClientRedisCache() *cache.RedisCache {
 	cacheClient := cache.RedisCache{
 		Conn:   j.createRedisPool(),
 		Prefix: j.config.redis.prefix,
+	}
+
+	return &cacheClient
+}
+
+func (j *January) createBadgerConn() *badger.DB {
+	db, err := badger.Open(badger.DefaultOptions(j.RootPath + "/tmp/cache/badger"))
+	if err != nil {
+		return nil
+	}
+	return db
+}
+
+func (j *January) createClientBadgerCache() *cache.BadgerCache {
+	cacheClient := cache.BadgerCache{
+		Conn: j.createBadgerConn(),
 	}
 
 	return &cacheClient
