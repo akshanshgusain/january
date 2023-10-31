@@ -104,6 +104,7 @@ gen
 
 # Dependency directories (remove the comment below to include it)
 vendor/
+cache/testdata/
 
 # Go workspace file
 go.work

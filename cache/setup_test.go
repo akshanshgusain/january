@@ -45,7 +45,7 @@ func TestMain(m *testing.M) {
 			log.Fatal(err)
 		}
 	}
-	err = os.Mkdir("./testdata/tmp", 0755)
+	err = os.Mkdir("./testdata/tmp/badger", 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
