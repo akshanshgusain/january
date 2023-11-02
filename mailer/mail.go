@@ -3,14 +3,18 @@ package mailer
 import (
 	"bytes"
 	"fmt"
+	"github.com/vanng822/go-premailer/premailer"
+	mail "github.com/xhit/go-simple-mail/v2"
 	"html/template"
+	"time"
 )
 
+// Mail holds the information necessary to connect to an SMTP server
 type Mail struct {
 	Domain      string
 	Templates   string
 	Host        string
-	Port        string
+	Port        int
 	Username    string
 	Password    string
 	Encryption  string
@@ -23,6 +27,7 @@ type Mail struct {
 	APIUrl      string
 }
 
+// Message is the type for an email message
 type Message struct {
 	From        string
 	FromName    string
@@ -33,11 +38,17 @@ type Message struct {
 	Data        interface{}
 }
 
+// Result contains information regarding the status of the sent email message
 type Result struct {
 	Success bool
 	Error   error
 }
 
+// ListenFromMail ListenForMail listens to the mail channel and sends mail
+// when it receives a payload. It runs continually in the background,
+// and sends error/success messages back on the Results channel.
+// Note that if api and api key are set, it will prefer using
+// an api to send mail
 func (m *Mail) ListenFromMail() {
 	for {
 		msg := <-m.Jobs
@@ -55,8 +66,53 @@ func (m *Mail) Send(msg Message) error {
 	return m.SendSMTPMessage(msg)
 }
 
+// SendSMTPMessage builds and sends an email message using SMTP. This is called by ListenForMail,
+// and can also be called directly when necessary
 func (m *Mail) SendSMTPMessage(msg Message) error {
-	// TODO: implement the mechanism later
+	formattedMessage, err := m.buildHTMLMessage(msg)
+	if err != nil {
+		return err
+	}
+
+	plainMessage, err := m.buildPlainTextMessage(msg)
+	if err != nil {
+		return err
+	}
+
+	newSMTPClient := mail.NewSMTPClient()
+	newSMTPClient.Host = m.Host
+	newSMTPClient.Port = m.Port
+	newSMTPClient.Username = m.Username
+	newSMTPClient.Password = m.Password
+	newSMTPClient.Encryption = m.getEncryption(m.Encryption)
+	newSMTPClient.KeepAlive = false
+	newSMTPClient.ConnectTimeout = 10 * time.Second
+	newSMTPClient.SendTimeout = 10 * time.Second
+
+	smtpClient, err := newSMTPClient.Connect()
+	if err != nil {
+		return err
+	}
+
+	newEmailMessage := mail.NewMSG()
+	newEmailMessage.SetFrom(msg.From).
+		AddTo(msg.To).
+		SetSubject(msg.Subject)
+
+	newEmailMessage.SetBody(mail.TextHTML, formattedMessage)
+	newEmailMessage.AddAlternative(mail.TextPlain, plainMessage)
+
+	if len(msg.Attachments) > 0 {
+		for _, x := range msg.Attachments {
+			newEmailMessage.AddAttachment(x)
+		}
+	}
+
+	err = newEmailMessage.Send(smtpClient)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -75,6 +131,10 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	}
 
 	formattedMessage := tpl.String()
+	formattedMessage, err = m.inlineCSS(formattedMessage)
+	if err != nil {
+		return "", err
+	}
 
 	return formattedMessage, nil
 }
@@ -96,4 +156,39 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 	plainMessage := tpl.String()
 
 	return plainMessage, nil
+}
+
+// getEncryption returns the appropriate encryption type based on a string value
+func (m *Mail) getEncryption(e string) mail.Encryption {
+	switch e {
+	case "tls":
+		return mail.EncryptionSTARTTLS
+	case "ssl":
+		return mail.EncryptionSSL
+	case "none":
+		return mail.EncryptionNone
+	default:
+		return mail.EncryptionSTARTTLS
+	}
+}
+
+// inlineCSS takes html input as a string, and inlines css where possible
+func (m *Mail) inlineCSS(s string) (string, error) {
+	options := premailer.Options{
+		RemoveClasses:     false,
+		CssToAttributes:   false,
+		KeepBangImportant: true,
+	}
+
+	prem, err := premailer.NewPremailerFromString(s, &options)
+	if err != nil {
+		return "", err
+	}
+
+	html, err := prem.Transform()
+	if err != nil {
+		return "", err
+	}
+
+	return html, nil
 }
