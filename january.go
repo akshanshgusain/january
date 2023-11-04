@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/CloudyKit/jet/v6"
 	"github.com/akshanshgusain/january/cache"
+	"github.com/akshanshgusain/january/mailer"
 	"github.com/alexedwards/scs/v2"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/go-chi/chi/v5"
@@ -41,6 +42,7 @@ type January struct {
 	EncryptionKey  string
 	Cache          cache.Cache
 	Scheduler      *cron.Cron
+	Mail           mailer.Mail
 }
 
 type configuration struct {
@@ -55,7 +57,7 @@ type configuration struct {
 func (j *January) New(rootPath string) error {
 	pathConfig := initPaths{
 		rootPath:    rootPath,
-		folderNames: []string{"handlers", "migrations", "views", "data", "public", "tmp", "logs", "middleware"},
+		folderNames: []string{"handlers", "migrations", "views", "mail", "data", "public", "tmp", "logs", "middleware"},
 	}
 
 	if err := j.Init(pathConfig); err != nil {
@@ -80,6 +82,9 @@ func (j *January) New(rootPath string) error {
 	infoLog, errorLog := j.startLoggers()
 	j.ErrorLog = errorLog
 	j.InfoLog = infoLog
+
+	// create mailer
+	j.Mail = j.createMailer()
 
 	// check if redis is available
 	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
@@ -181,6 +186,9 @@ func (j *January) New(rootPath string) error {
 	// add Template Engine
 	j.createTemplateEngine()
 
+	// mailer-background task: go routine to listen to mails in the background
+	go j.Mail.ListenFromMail()
+
 	return nil
 }
 
@@ -220,6 +228,29 @@ func (j *January) createTemplateEngine() {
 		JetViews:       j.JetViews,
 		Session:        j.Session,
 	}
+}
+
+func (j *January) createMailer() mailer.Mail {
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	m := mailer.Mail{
+		Domain:      os.Getenv("MAIL_DOMAIN"),
+		Templates:   j.RootPath + "/mail",
+		Host:        os.Getenv("SMTP_HOST"),
+		Port:        port,
+		Username:    os.Getenv("SMTP_USERNAME"),
+		Password:    os.Getenv("SMTP_PASSWORD"),
+		Encryption:  os.Getenv("SMTP_ENCRYPTION"),
+		FromName:    os.Getenv("FROM_NAME"),
+		FromAddress: os.Getenv("FROM_ADDRESS"),
+
+		// TODO: figure out a way to dynamically change the channel size
+		Jobs:    make(chan mailer.Message, 20), // 20 Jobs at a time
+		Results: make(chan mailer.Result, 20),
+		API:     os.Getenv("MAILER_API"),
+		APIKey:  os.Getenv("MAILER_KEY"),
+		APIUrl:  os.Getenv("MAILER_URL"),
+	}
+	return m
 }
 
 func (j *January) RunServer() {
