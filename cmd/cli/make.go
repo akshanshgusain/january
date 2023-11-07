@@ -109,6 +109,24 @@ func doMake(arg2, arg3 string) error {
 	case "key":
 		rnd := j.RandomString(32)
 		color.Yellow("32 character encryption key: %s", rnd)
+
+	case "mail":
+		if arg3 == "" {
+			exitGracefully(errors.New("you must give the mail template a name"))
+		}
+
+		htmlMail := j.RootPath + "/mail/" + strings.ToLower(arg3) + ".html.tmpl"
+		plainMail := j.RootPath + "/mail/" + strings.ToLower(arg3) + ".plain.tmpl"
+
+		err := copyFileFromTemplate("templates/mailer/mail.html.tmpl", htmlMail)
+		if err != nil {
+			exitGracefully(err)
+		}
+
+		err = copyFileFromTemplate("templates/mailer/mail.plain.tmpl", plainMail)
+		if err != nil {
+			exitGracefully(err)
+		}
 	}
 	return nil
 }
