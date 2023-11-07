@@ -65,6 +65,7 @@ func showHelp() {
 	make model <name>     - creates a stub model in the data directory
 	make session          - creates a tables in the database as a session store
 	make key              - generates a 32 character random string
+	make mail <name>      - create two starter mail templates in the mail directory
 	`)
 }
 
