@@ -54,7 +54,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("Could not start resource")
 	}
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	go mailer.ListenForMail()
 
