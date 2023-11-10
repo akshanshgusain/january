@@ -44,3 +44,24 @@ func TestMail_SendUsingChan(t *testing.T) {
 		t.Error(errors.New("no error received with invalid to address"))
 	}
 }
+
+func TestMail_SendUsingAPI(t *testing.T) {
+	msg := Message{
+		To:          "you@there.com",
+		Subject:     "test",
+		Template:    "test",
+		Attachments: []string{"./testdata/mail/test.html.tmpl"},
+	}
+
+	mailer.API = "unknown"
+	mailer.APIKey = "abc123"
+	mailer.APIUrl = "https://www.fake.com"
+
+	err := mailer.SendUsingAPI(msg, "unknown")
+	if err == nil {
+		t.Error(err)
+	}
+	mailer.API = ""
+	mailer.APIKey = ""
+	mailer.APIUrl = ""
+}
