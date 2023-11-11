@@ -65,3 +65,35 @@ func TestMail_SendUsingAPI(t *testing.T) {
 	mailer.APIKey = ""
 	mailer.APIUrl = ""
 }
+
+func TestMail_buildHTMLMessage(t *testing.T) {
+	msg := Message{
+		From:        "me@here.com",
+		FromName:    "Joe",
+		To:          "you@there.com",
+		Subject:     "test",
+		Template:    "test",
+		Attachments: []string{"./testdata/mail/test.html.tmpl"},
+	}
+
+	_, err := mailer.buildHTMLMessage(msg)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestMail_buildPlainMessage(t *testing.T) {
+	msg := Message{
+		From:        "me@here.com",
+		FromName:    "Joe",
+		To:          "you@there.com",
+		Subject:     "test",
+		Template:    "test",
+		Attachments: []string{"./testdata/mail/test.html.tmpl"},
+	}
+
+	_, err := mailer.buildPlainTextMessage(msg)
+	if err != nil {
+		t.Error(err)
+	}
+}
