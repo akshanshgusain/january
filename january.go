@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -43,6 +44,7 @@ type January struct {
 	Cache          cache.Cache
 	Scheduler      *cron.Cron
 	Mail           mailer.Mail
+	Server         Server
 }
 
 type configuration struct {
@@ -52,6 +54,13 @@ type configuration struct {
 	sessionType    string
 	database       databaseConfig
 	redis          redisConfig
+}
+
+type Server struct {
+	ServerName string
+	Port       string
+	Secure     bool
+	URL        string
 }
 
 func (j *January) New(rootPath string) error {
@@ -146,6 +155,19 @@ func (j *January) New(rootPath string) error {
 			password: os.Getenv("REDIS_PASSWORD"),
 			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
+	}
+
+	// fill in server details
+	secure := true
+	if strings.ToLower(os.Getenv("SECURE")) == "false" {
+		secure = false
+	}
+
+	j.Server = Server{
+		ServerName: os.Getenv("SERVER_NAME"),
+		Port:       os.Getenv("PORT"),
+		Secure:     secure,
+		URL:        os.Getenv("APP_URL"),
 	}
 
 	// create session
