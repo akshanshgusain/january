@@ -47,12 +47,12 @@ type Result struct {
 	Error   error
 }
 
-// ListenFromMail ListenForMail listens to the mail channel and sends mail
+// ListenForMail listens to the mail channel and sends mail
 // when it receives a payload. It runs continually in the background,
 // and sends error/success messages back on the Results channel.
 // Note that if api and api key are set, it will prefer using
 // an api to send mail
-func (m *Mail) ListenFromMail() {
+func (m *Mail) ListenForMail() {
 	for {
 		msg := <-m.Jobs
 		err := m.Send(msg)

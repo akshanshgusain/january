@@ -187,7 +187,7 @@ func (j *January) New(rootPath string) error {
 	j.createTemplateEngine()
 
 	// mailer-background task: go routine to listen to mails in the background
-	go j.Mail.ListenFromMail()
+	go j.Mail.ListenForMail()
 
 	return nil
 }
