@@ -31,6 +31,8 @@ type TemplateData struct {
 	Port            string
 	ServerName      string
 	Secure          bool
+	Error           string
+	Flash           string
 }
 
 func (t *TemplateEngine) defaultData(td *TemplateData, r *http.Request) *TemplateData {
