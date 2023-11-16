@@ -40,6 +40,11 @@ func doAuth() error {
 		exitGracefully(err)
 	}
 
+	err = copyFileFromTemplate("templates/data/remember_token.go.txt", j.RootPath+"/data/remember_token.go")
+	if err != nil {
+		exitGracefully(err)
+	}
+
 	// copy middlewares
 	err = copyFileFromTemplate("templates/middleware/auth.go.txt", j.RootPath+"/middleware/auth.go")
 	if err != nil {
@@ -47,6 +52,46 @@ func doAuth() error {
 	}
 
 	err = copyFileFromTemplate("templates/middleware/authToken.go.txt", j.RootPath+"/middleware/authToken.go")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	err = copyFileFromTemplate("templates/middleware/remember.go.txt", j.RootPath+"/middleware/remember.go")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	// copy handlers
+	err = copyFileFromTemplate("templates/handlers/authHandlers.go.txt", j.RootPath+"/handlers/authHandlers.go")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	// copy views
+
+	// views-mailer
+	err = copyFileFromTemplate("templates/mailer/password-reset.html.tmpl", j.RootPath+"/mail/password-reset.html.tmpl")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	err = copyFileFromTemplate("templates/mailer/password-reset.plain.tmpl", j.RootPath+"/mail/password-reset.plain.tmpl")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	// views - views
+	err = copyFileFromTemplate("templates/views/login.jet", j.RootPath+"/views/login.jet")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	err = copyFileFromTemplate("templates/views/forget.jet", j.RootPath+"/views/forgot.jet")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	err = copyFileFromTemplate("templates/views/reset-password.jet", j.RootPath+"/views/reset-password.jet")
 	if err != nil {
 		exitGracefully(err)
 	}
