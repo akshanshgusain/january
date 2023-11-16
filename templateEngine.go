@@ -44,6 +44,9 @@ func (t *TemplateEngine) defaultData(td *TemplateData, r *http.Request) *Templat
 	if t.Session.Exists(r.Context(), "userID") {
 		td.IsAuthenticated = true
 	}
+	td.Error = t.Session.PopString(r.Context(), "error")
+	td.Flash = t.Session.PopString(r.Context(), "flash")
+
 	return td
 }
 
