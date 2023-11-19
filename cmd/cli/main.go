@@ -18,7 +18,7 @@ func main() {
 		exitGracefully(err)
 	}
 
-	setup()
+	setup(arg1, arg2)
 
 	switch arg1 {
 	case "help":
