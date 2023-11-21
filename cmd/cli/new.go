@@ -13,14 +13,14 @@ import (
 func doNew(appName string) {
 	appName = strings.ToLower(appName)
 
-	//TODO: sanitise the application name
+	//sanitise the application name
 	if strings.Contains(appName, "/") {
 		exploded := strings.SplitAfter(appName, "/")
 		appName = exploded[(len(exploded) - 1)]
 	}
 	log.Println("App name is: ", appName)
 
-	//TODO: git clone the skeleton application
+	//git clone the skeleton application
 	color.Green("\tcloning repository...")
 	_, err := git.PlainClone("./"+appName, false, &git.CloneOptions{
 		URL:      "https://github.com/akshanshgusain/january_app_skl",
@@ -33,13 +33,27 @@ func doNew(appName string) {
 		exitGracefully(err)
 	}
 
-	//TODO: remove the .gitignore
+	//remove the .gitignore
 	err = os.RemoveAll(fmt.Sprintf("./%s/.git", appName))
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	// TODO: create a .env file
+	//create a .env file
+	color.Yellow("\tcreating .env file")
+	data, err := templateFS.ReadFile("templates/env.txt")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	env := string(data)
+	env = strings.ReplaceAll(env, "${APP_NAME}", appName)
+	env = strings.ReplaceAll(env, "${KEY}", j.RandomString(32))
+
+	err = copyDataToFile([]byte(env), fmt.Sprintf("./%s/.env", appName))
+	if err != nil {
+		exitGracefully(err)
+	}
 
 	//TODO: update the go.mod file
 
