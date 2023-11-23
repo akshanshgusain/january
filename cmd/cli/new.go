@@ -131,5 +131,5 @@ func doNew(appName string) {
 	}
 
 	color.Green("done building " + appURL)
-	color.Green("Go build something awesome!")
+	color.Green("go build something awesome!")
 }
