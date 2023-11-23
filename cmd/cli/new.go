@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
 	"github.com/fatih/color"
+	"github.com/go-git/go-git/v5"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -18,6 +21,16 @@ func doNew(appName string) {
 
 	//TODO: git clone the skeleton application
 	color.Green("\tcloning repository...")
+	_, err := git.PlainClone("./"+appName, false, &git.CloneOptions{
+		URL:      "https://github.com/akshanshgusain/january_app_skl",
+		Progress: os.Stdout,
+		Depth:    1,
+	})
+
+	if err != nil {
+		exitGracefully(errors.New("error cloning the skeleton project: "))
+		exitGracefully(err)
+	}
 
 	//TODO: remove the .gitignore
 

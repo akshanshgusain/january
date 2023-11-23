@@ -18,3 +18,6 @@ count:
 
 count_all:
 	 find . -type f \( -name '*.go' -o -name '*.yaml' -o -name '*.jet' -o -name '*.txt' -o -name '*.sql' \) | xargs cat | wc -l
+
+build:
+	@go build -o ./dist/january ./cmd/cli
