@@ -110,7 +110,7 @@ func updateSourceFiles(path string, fi os.FileInfo, err error) error {
 	// we have a matching file
 	if matched {
 		// read file contents
-		read, err := ioutil.ReadFile(path)
+		read, err := os.ReadFile(path)
 		if err != nil {
 			exitGracefully(err)
 		}

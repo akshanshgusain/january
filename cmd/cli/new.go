@@ -118,6 +118,8 @@ func doNew(appName string) {
 
 	//TODO: update existing .go files with correct name/imports
 	color.Yellow("\tupdating source files...")
+	os.Chdir("./" + appName)
+
 	updateSource()
 
 	// TODO: run go mod tidy
