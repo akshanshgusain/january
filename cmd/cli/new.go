@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/fatih/color"
 	"github.com/go-git/go-git/v5"
 	"log"
@@ -33,6 +34,10 @@ func doNew(appName string) {
 	}
 
 	//TODO: remove the .gitignore
+	err = os.RemoveAll(fmt.Sprintf("./%s/.git", appName))
+	if err != nil {
+		exitGracefully(err)
+	}
 
 	// TODO: create a .env file
 
