@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -118,7 +117,7 @@ func updateSourceFiles(path string, fi os.FileInfo, err error) error {
 		newContents := strings.Replace(string(read), "myapp", appURL, -1)
 
 		// write the changed file
-		err = ioutil.WriteFile(path, []byte(newContents), 0)
+		err = os.WriteFile(path, []byte(newContents), 0)
 		if err != nil {
 			exitGracefully(err)
 		}
