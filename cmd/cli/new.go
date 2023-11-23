@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 )
@@ -99,7 +100,7 @@ func doNew(appName string) {
 	_ = os.Remove("./" + appName + "/Makefile.mac")
 	_ = os.Remove("./" + appName + "/Makefile.windows")
 
-	//TODO: update the go.mod file
+	// update the go.mod file
 
 	color.Yellow("\tcreating go.mod file...")
 	_ = os.Remove("./" + appName + "/go.mod")
@@ -116,11 +117,19 @@ func doNew(appName string) {
 		exitGracefully(err)
 	}
 
-	//TODO: update existing .go files with correct name/imports
+	//update existing .go files with correct name/imports
 	color.Yellow("\tupdating source files...")
 	os.Chdir("./" + appName)
-
 	updateSource()
 
-	// TODO: run go mod tidy
+	//  run go mod tidy
+	color.Yellow("\trunning go mod tidy...")
+	cmd := exec.Command("go", "mod", "tidy")
+	err = cmd.Start()
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	color.Green("done building " + appURL)
+	color.Green("Go build something awesome!")
 }
