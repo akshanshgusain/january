@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/fatih/color"
 	"log"
 	"strings"
 )
@@ -16,6 +17,7 @@ func doNew(appName string) {
 	log.Println("App name is: ", appName)
 
 	//TODO: git clone the skeleton application
+	color.Green("\tcloning repository...")
 
 	//TODO: remove the .gitignore
 
