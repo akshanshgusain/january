@@ -12,9 +12,11 @@ import (
 	"strings"
 )
 
+var appURL string
+
 func doNew(appName string) {
 	appName = strings.ToLower(appName)
-	var appURL = appName
+	appURL = appName
 
 	//sanitise the application name
 	if strings.Contains(appName, "/") {
@@ -115,6 +117,8 @@ func doNew(appName string) {
 	}
 
 	//TODO: update existing .go files with correct name/imports
+	color.Yellow("\tupdating source files...")
+	updateSource()
 
 	// TODO: run go mod tidy
 }
