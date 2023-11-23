@@ -108,7 +108,7 @@ cache/testdata/
 
 # Go workspace file
 go.work
-./dist
+dist
 
 ### macOS template
 # General
