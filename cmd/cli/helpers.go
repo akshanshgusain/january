@@ -27,6 +27,7 @@ func setup(arg1, arg2 string) {
 	}
 }
 
+// re-formating the DSN for the golang-migration/migration tool
 func getDSN() string {
 	dbType := j.DB.DataType
 
@@ -63,7 +64,7 @@ func showHelp() {
 
 	help                  - show the help commands
 	version               - print application version
-	migrate               - runs all up migrations that have not been run previously
+	migrate up            - runs all up migrations that have not been run previously
 	migrate down          - reverses the most recent migration
 	migrate reset         - runs all down migrations in reverse order, and then all up migrations
 	make migration <name> - creates two new up and down migrations in the migrations folder
