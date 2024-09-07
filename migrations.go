@@ -7,8 +7,8 @@ import (
 	"log"
 )
 
+// MigrateUp run migrations which have not yet been run
 func (j *January) MigrateUp(dsn string) error {
-	log.Println(dsn)
 	m, err := migrate.New("file://"+j.RootPath+"/migrations", dsn)
 	if err != nil {
 		return err

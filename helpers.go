@@ -63,7 +63,7 @@ func (e *Encryption) Encrypt(text string) (string, error) {
 	cipherText := make([]byte, aes.BlockSize+len(plainText)) // data structure for encryption
 
 	//An initialization vector (IV) is an arbitrary number that can be used with a secret key for data
-	//encryption to foil cyber attacks
+	//encryption to foil cyberattacks
 	iv := cipherText[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err

@@ -127,6 +127,22 @@ func doMake(arg2, arg3 string) error {
 		if err != nil {
 			exitGracefully(err)
 		}
+	default:
+		showDoMakeHelp()
 	}
 	return nil
+}
+
+func showDoMakeHelp() {
+	// use spaces not tabs
+	color.Magenta(`Available make <sub commands>:
+
+	migration <name>            - show the help commands
+	auth                        - print application version
+	handler <name>              - runs all up migrations that have not been run previously
+	model <name>                - reverses the most recent migration
+	session                     - runs all down migrations in reverse order, and then all up migrations
+	key                         - creates two new up and down migrations in the migrations folder
+	mail                        - creates and runs migrations for authentication tables, and creates models and middleware
+	`)
 }

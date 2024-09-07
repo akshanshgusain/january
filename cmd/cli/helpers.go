@@ -11,6 +11,8 @@ import (
 
 func setup(arg1, arg2 string) {
 	if arg1 != "new" && arg1 != "version" && arg1 != "help" {
+		// irrespective of where the binary lives, if the current directory
+		// has got the .env file it will work. current directory = root path
 		err := godotenv.Load()
 		if err != nil {
 			exitGracefully(err)
@@ -56,7 +58,8 @@ func getDSN() string {
 }
 
 func showHelp() {
-	color.Yellow(`Available commands:
+	// use spaces not tabs
+	color.Magenta(`Available commands:
 
 	help                  - show the help commands
 	version               - print application version
@@ -82,7 +85,7 @@ func exitGracefully(e error, msg ...string) {
 		color.Red("Error: %v\n", e)
 	}
 	if len(message) > 0 {
-		color.Yellow(message)
+		color.Magenta(message)
 	} else {
 		color.Green("Finished!")
 	}

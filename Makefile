@@ -11,7 +11,7 @@ coverage:
 	@go test -cover ./...
 
 build_cli:
-	@go build -o ../januaryApp/january ./cmd/cli
+	@go build -o ../januaryApp/januarycli ./cmd/cli
 
 count:
 	 find . -type f -name '*.go' | xargs cat | wc -l
@@ -21,3 +21,4 @@ count_all:
 
 build:
 	@go build -o ./dist/january ./cmd/cli
+	cp ./dist/january ~/GolandProjects/januaryFramework/january_execuatable
