@@ -1,5 +1,10 @@
 package main
 
+import (
+	"errors"
+	"github.com/fatih/color"
+)
+
 func doMigrate(arg2, arg3 string) error {
 	dsn := getDSN()
 
@@ -33,8 +38,19 @@ func doMigrate(arg2, arg3 string) error {
 			return err
 		}
 	default:
-		showHelp()
+		showMigrateHelp()
+		return errors.New("invalid migrate command")
 	}
 
 	return nil
+}
+
+func showMigrateHelp() {
+	// use spaces not tabs
+	color.Magenta(`Available migrate <sub commands>:
+
+	up                          - runs all up migrations that have not been run previously
+	down                        - reverses the most recent migration
+	reset                       - runs all down migrations in reverse order, and then all up migrations
+	`)
 }
