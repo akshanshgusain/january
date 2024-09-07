@@ -27,6 +27,7 @@ func setup(arg1, arg2 string) {
 	}
 }
 
+// re-formating the DSN for the golang-migration/migration tool
 func getDSN() string {
 	dbType := j.DB.DataType
 
