@@ -9,8 +9,9 @@ import (
 	"time"
 )
 
+// Validation Easy validation for Form-Post
 type Validation struct {
-	Data   url.Values
+	Data   url.Values // this is standard for query params and form data
 	Errors map[string]string
 }
 
