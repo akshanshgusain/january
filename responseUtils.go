@@ -29,6 +29,9 @@ func (j *January) ReadJson(w http.ResponseWriter, r *http.Request, data interfac
 	return nil
 }
 
+// WriteJson Marshals data
+// Sets the appropriate headers
+// write the marshaled data to http.ResponseWriter
 func (j *January) WriteJson(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
 	out, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
@@ -51,6 +54,9 @@ func (j *January) WriteJson(w http.ResponseWriter, status int, data interface{},
 	return nil
 }
 
+// WriteXML Marshals data
+// Sets the appropriate headers
+// write the marshaled data to http.ResponseWriter
 func (j *January) WriteXML(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
 	out, err := xml.MarshalIndent(data, "", "")
 	if err != nil {
