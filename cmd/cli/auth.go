@@ -40,7 +40,7 @@ func doAuth() error {
 		exitGracefully(err)
 	}
 
-	err = copyFileFromTemplate("templates/data/remember_token.go.txt", j.RootPath+"/data/remember_token.go")
+	err = copyFileFromTemplate("templates/data/rememberToken.go.txt", j.RootPath+"/data/remember_token.go")
 	if err != nil {
 		exitGracefully(err)
 	}
