@@ -11,7 +11,7 @@ coverage:
 	@go test -cover ./...
 
 build_cli:
-	@go build -o ../januaryApp/januarycli ./cmd/cli
+	@go build -o ../januaryApp/january-cli ./cmd/cli
 
 count:
 	 find . -type f -name '*.go' | xargs cat | wc -l

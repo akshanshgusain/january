@@ -46,13 +46,19 @@ When teams at my organization began transitioning from Python, Node.js, and PHP 
 
 
 ---
+## 👾 WIP
+
+1. **Build with January/January-recipes** a repository of apps build with January framework
+2. **Go January Docs**: [Documentation, coming soon!](https://gojanuary.akshanshgusain.com)
+
+---
 
 ## ⚙️ Installation
 
 January requires **Go version** `1.18` or **higher** to run. If you need to install or upgrade Go, visit the [official Go download page](https://go.dev/dl/). 
 
 To start setting up your project download the **January-CLI** tool
-from here [January-CLI](https://github.com/akshanshgusain/january-cli)
+from here [January-CLI](https://github.com/akshanshgusain/january-cli/blob/master/january-cli)
 or,
 
 **Homebrew installation**: coming soon!
