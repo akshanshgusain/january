@@ -359,10 +359,10 @@ func (t *ModelName) Builder(id int) ([]*ModelName, error) {
    } 
     ```
    
-### 📆 Broken Features
+## 📆 Broken Features
 1. I will be removing the Jet Templating support, the standard library support for templating is decent.
 
-### 📆 Upcoming Features
+## 📆 Upcoming Features
 1. MariaDB support
 2. Live-reloads 
 3. Automatic Swagger Documentation
