@@ -42,8 +42,13 @@
 
 ## ⚙️ Installation
 
-January requires **Go version** `1.18` or **higher** to run. To start setting up your project download the **January-CLI** tool
+January requires **Go version** `1.18` or **higher** to run. If you need to install or upgrade Go, visit the [official Go download page](https://go.dev/dl/). 
+
+To start setting up your project download the **January-CLI** tool
 from here [January-CLI](https://github.com/akshanshgusain/january-cli)
+or,
+
+**Homebrew installation**: coming soon!
 
 
 ## ⚡️ Quickstart
@@ -83,4 +88,41 @@ make stop
 
 Stopping January...
 Stopped January!
+```
+
+
+## ⚡️ Project Structure
+
+```console
+your-repository-name/
+│
+├── data/
+│   └── models.go
+│
+├── database/
+│   └── docker-compsoe.yaml
+│
+├── handlers/
+│   ├── handlers.go
+│   └── handlerHelper.go
+│
+├── middleware/
+│   └── middleware.go
+│
+├── public/
+│   ├── ico/
+│   └── images/
+│
+├── views/
+│   ├── layouts/
+│   └── home.jet
+│
+├── .gitignore
+├── Makefile
+├── go.mod
+├── init.january.go
+├── januaryAppHelper.go
+├── main.go
+└── README.md
+└── routes.go
 ```
