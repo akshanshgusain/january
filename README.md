@@ -109,6 +109,8 @@ your-repository-name/
 ├── middleware/
 │   └── middleware.go
 │
+├── migartions/
+│
 ├── public/
 │   ├── ico/
 │   └── images/
@@ -130,7 +132,31 @@ your-repository-name/
 
 ## 👀 Examples
 
-Listed below are some of the common use-cases. If you want to see more code examples, please visit our [Build With repository](https://github.com/gofiber/recipes)
+Listed below are some of the common use-cases. If you want to see more code examples, please visit our [Build With January repository](https://github.com/gofiber/recipes)
+
+### 📖 **Create Migration Files**
+
+Create migration file using the **january-cli**. The following command will create two migration files: **<migration-name>.up.sql** and **<migration-name>.down.sql** in the 
+```bash
+./january-cli make migration <migartion-name>
+```
+
+### 📖 **Run Migrations**
+
+Run migrations with the **january-cli**. The following command will run the migration:
+1. Migrate Up: Run the latest up migration:
+```bash
+./january-cli migrate up
+```
+2. Migrate Down: Run the latest down migration:
+```bash
+./january-cli migrate down
+```
+3. Migrate Rest: Run all the down migrations and then run all the up migrations:
+```bash
+./january-cli migrate reset
+```
+
 
 ### 📖 **Create APIs**
 
@@ -169,10 +195,10 @@ Listed below are some of the common use-cases. If you want to see more code exam
     ```Go
    func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
             // Get path parameter
-            userID := chi.URLParam(r, "pathParamVar")
+            pathParamVar := chi.URLParam(r, "pathParamVar")
 
             // Get query parameters
-            name := r.URL.Query().Get("queryParamVar")
+            queryParamVar := r.URL.Query().Get("queryParamVar")
             
             // Business Logic goes here:
              ...
