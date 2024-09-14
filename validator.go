@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-// Validation Easy validation for Form-Post
-type Validation struct {
-	Data   url.Values // this is standard for query params and form data
-	Errors map[string]string
-}
-
 func (j *January) Validator(data url.Values) *Validation {
 	return &Validation{
 		Data:   data,
 		Errors: make(map[string]string),
 	}
+}
+
+// Validation Easy validation for Form-Post
+type Validation struct {
+	Data   url.Values // this is standard for query params and form data
+	Errors map[string]string
 }
 
 func (v *Validation) Valid() bool {
