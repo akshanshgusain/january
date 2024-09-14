@@ -195,12 +195,6 @@ func New(databasePool *sql.DB) Models {
 ```
 Now, your models are ready to use. The Models come with pre-build CRUD methods:
 ```Go
-package data
-
-import (
-    up "github.com/upper/db/v4"
-    "time"
-)
 // ModelName struct
 type ModelName struct {
     ID        int       `db:"id,omitempty"`
