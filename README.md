@@ -163,7 +163,7 @@ Create a model with **january-cli**. The following command will create a `model-
 ```bash
 ./january-cli make model <model-name>
 ```
-By default the Models are generate with [Upper](https://upper.io/v4/) DAL to access the Database. After generating the `model-name.go` it needs to me added to the **Model struct** in the `data/models.go`.
+By default the Models are generate with [Upper](https://upper.io/v4/) DAL to access the Database. After generating the `modelname.go` it needs to me added to the **Model struct** in the `data/models.go`.
 ```Go
 var db *sql.DB
 var upper db2.Session
@@ -193,7 +193,109 @@ func New(databasePool *sql.DB) Models {
 	}
 }
 ```
-Now, your models are ready to use.
+Now, your models are ready to use. The Models come with pre-build CRUD methods:
+```Go
+package data
+
+import (
+    up "github.com/upper/db/v4"
+    "time"
+)
+// ModelName struct
+type ModelName struct {
+    ID        int       `db:"id,omitempty"`
+    CreatedAt time.Time `db:"created_at"`
+    UpdatedAt time.Time `db:"updated_at"`
+}
+
+// Table returns the table name
+func (t *ModelName) Table() string {
+    return "modelnames"
+}
+
+// GetAll gets all records from the database, using upper
+func (t *ModelName) GetAll(condition up.Cond) ([]*ModelName, error) {
+    collection := upper.Collection(t.Table())
+    var all []*ModelName
+
+    res := collection.Find(condition)
+    err := res.All(&all)
+    if err != nil {
+        return nil, err
+    }
+
+    return all, err
+}
+
+// Get gets one record from the database, by id, using upper
+func (t *ModelName) Get(id int) (*ModelName, error) {
+    var one ModelName
+    collection := upper.Collection(t.Table())
+
+    res := collection.Find(up.Cond{"id": id})
+    err := res.One(&one)
+    if err != nil {
+        return nil, err
+    }
+    return &one, nil
+}
+
+// Update updates a record in the database, using upper
+func (t *ModelName) Update(m ModelName) error {
+    m.UpdatedAt = time.Now()
+    collection := upper.Collection(t.Table())
+    res := collection.Find(m.ID)
+    err := res.Update(&m)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+// Delete deletes a record from the database by id, using upper
+func (t *ModelName) Delete(id int) error {
+    collection := upper.Collection(t.Table())
+    res := collection.Find(id)
+    err := res.Delete()
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+// Insert inserts a model into the database, using upper
+func (t *ModelName) Insert(m ModelName) (int, error) {
+    m.CreatedAt = time.Now()
+    m.UpdatedAt = time.Now()
+    collection := upper.Collection(t.Table())
+    res, err := collection.Insert(m)
+    if err != nil {
+        return 0, err
+    }
+
+    id := getInsertID(res.ID())
+
+    return id, nil
+}
+
+// Builder is an example of using upper's sql builder
+func (t *ModelName) Builder(id int) ([]*ModelName, error) {
+    collection := upper.Collection(t.Table())
+
+    var result []*ModelName
+
+    err := collection.Session().
+        SQL().
+        SelectFrom(t.Table()).
+        Where("id > ?", id).
+        OrderBy("id").
+        All(&result)
+    if err != nil {
+        return nil, err
+    }
+    return result, nil
+}
+```
 
 
 ### 📖 **Create APIs**
