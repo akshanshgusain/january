@@ -160,34 +160,34 @@ Listed below are some of the common use-cases. If you want to see more code exam
         a.delete("/api/your-delete-route", a.Handlers.DeleteHandler)
    }
     ```
-   3. Create a **Handler** and write your business login:
-       Create a handler using the **january-cli**: 
-       ```bash
-      ./january-cli make handler <your-handler-name>
-       ```
-      The above command will create a handler named: `your-handler-name.go` in the **handlers** folder.
-       ```Go
-      func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
-               // Get path parameter
-               userID := chi.URLParam(r, "pathParamVar")
+3. Create a **Handler** and write your business login:
+    Create a handler using the **january-cli**: 
+    ```bash
+   ./january-cli make handler <your-handler-name>
+    ```
+   The above command will create a handler named: `your-handler-name.go` in the **handlers** folder.
+    ```Go
+   func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
+            // Get path parameter
+            userID := chi.URLParam(r, "pathParamVar")
 
-               // Get query parameters
-               name := r.URL.Query().Get("queryParamVar")
+            // Get query parameters
+            name := r.URL.Query().Get("queryParamVar")
             
-               // Business Logic goes here:
-                ...
+            // Business Logic goes here:
+             ...
       
-                // declare return response struct
-               var resp struct {
-                       Error   bool   `json:"error"`
-                       Message string `json:"message"`
-                       Value   string `json:"value"`
-                   }
+             // declare return response struct
+            var resp struct {
+                    Error   bool   `json:"error"`
+                    Message string `json:"message"`
+                    Value   string `json:"value"`
+                }
 				   
-                resp.Error = false
-                resp.Message = "Success"
-                resp.Value = fromCache.(string)
+             resp.Error = false
+             resp.Message = "Success"
+             resp.Value = fromCache.(string)
        
-                _ = h.App.WriteJson(w, http.StatusOk, resp)
-      } 
-       ```
+             _ = h.App.WriteJson(w, http.StatusOk, resp)
+   } 
+    ```
