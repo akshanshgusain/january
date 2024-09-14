@@ -57,13 +57,13 @@ Here is  a basic example to create a simple web app with **January-CLI**:
 ```bash
 ./january-cli new github.com/your_username/your-repository_name
 ```
-This command creates a new project folder named **your-repository-name**.
-After creating the project move the CLI to the project folder :
+This command creates a new project directory named **your-repository-name**.
+After creating the project move the CLI to the project directory :
 
 ```bash
 mv ./january-cli ./your-repository-name
 ```
-and cd into the project folder:
+and cd into the project directory:
 ```bash
 cd your-repository-name/
 ```
@@ -134,7 +134,7 @@ your-repository-name/
 
 Listed below are some of the common use-cases. If you want to see more code examples, please visit our [Build With January repository](https://github.com/gofiber/recipes)
 
-### 📖 **Create Migration Files**
+### 📖 **Generate Migration Files**
 
 Create migration file using the **january-cli**. The following command will create two migration files: **<migration-name>.up.sql** and **<migration-name>.down.sql** in the 
 ```bash
@@ -156,6 +156,44 @@ Run migrations with the **january-cli**. The following command will run the migr
 ```bash
 ./january-cli migrate reset
 ```
+
+### 📖 **Generate Model**
+
+Create a model with **january-cli**. The following command will create a `model-name.go` file in the data directory: 
+```bash
+./january-cli make model <model-name>
+```
+By default the Models are generate with [Upper](https://upper.io/v4/) DAL to access the Database. After generating the `model-name.go` it needs to me added to the **Model struct** in the `data/models.go`.
+```Go
+var db *sql.DB
+var upper db2.Session
+
+type Models struct {
+	// any models inserted here (and in the new function)
+	// are easily accessible throughout the entire application
+	ModelNames  ModelName   // <---- your Model(s)
+}
+
+func New(databasePool *sql.DB) Models {
+	db = databasePool
+
+	switch os.Getenv("DATABASE_TYPE") {
+	case "mysql", "mariadb":
+
+		upper, _ = mysql.New(databasePool)
+	case "postgres", "postgresql":
+
+		upper, _ = postgresql.New(databasePool)
+	default:
+		// do nothing
+	}
+
+	return Models{
+        ModelNames:  ModelName{},
+	}
+}
+```
+Now, your models are ready to use.
 
 
 ### 📖 **Create APIs**
@@ -191,7 +229,7 @@ Run migrations with the **january-cli**. The following command will run the migr
     ```bash
    ./january-cli make handler <your-handler-name>
     ```
-   The above command will create a handler named: `your-handler-name.go` in the **handlers** folder.
+   The above command will create a handler named: `your-handler-name.go` in the **handlers** directory.
     ```Go
    func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
             // Get path parameter
