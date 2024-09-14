@@ -358,3 +358,13 @@ func (t *ModelName) Builder(id int) ([]*ModelName, error) {
              _ = h.App.WriteJson(w, http.StatusOk, resp)
    } 
     ```
+   
+### 📆 Broken Features
+1. I will be removing the Jet Templating support, the standard library support for templating is decent.
+
+### 📆 Upcoming Features
+1. MariaDB support
+2. Live-reloads 
+3. Automatic Swagger Documentation
+4. File system support
+5. Support for Websockets, GraphQL and gRPC
