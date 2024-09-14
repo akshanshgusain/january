@@ -91,7 +91,7 @@ Stopped January!
 ```
 
 
-## ⚡️ Project Structure
+## 🏢️ Project Structure
 
 ```console
 your-repository-name/
@@ -126,3 +126,68 @@ your-repository-name/
 └── README.md
 └── routes.go
 ```
+
+
+## 👀 Examples
+
+Listed below are some of the common use-cases. If you want to see more code examples, please visit our [Build With repository](https://github.com/gofiber/recipes)
+
+### 📖 **Create APIs**
+
+1. Connect to your **Postgres** database by supplying these values in the `.env` file
+
+    ```.dotenv
+    DATABASE_TYPE=postgres
+    DATABASE_HOST=localhost
+    DATABASE_PORT=5432
+    DATABASE_USER=postgres_use
+    DATABASE_PASS=postgres_password
+    DATABASE_NAME=postgres_db
+    DATABASE_SSL_MODE=disable
+    ```
+2. Write your routes in the `routes.go`:
+    ```Go
+   func (a *application) routes() *chi.Mux {
+        // GET
+        a.get("/api/your-get-route", a.Handlers.GetHandler)
+        // POST
+        a.post("/api/your-post-route", a.Handlers.PostHandler)
+        // PUT
+        a.put("/api/your-put-route", a.Handlers.PutHandler)
+        // PATCH
+        a.patch("/api/your-patch-route", a.Handlers.PatchHandler)
+        // DELETE
+        a.delete("/api/your-delete-route", a.Handlers.DeleteHandler)
+   }
+    ```
+   3. Create a **Handler** and write your business login:
+       Create a handler using the **january-cli**: 
+       ```bash
+      ./january-cli make handler <your-handler-name>
+       ```
+      The above command will create a handler named: `your-handler-name.go` in the **handlers** folder.
+       ```Go
+      func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
+               // Get path parameter
+               userID := chi.URLParam(r, "pathParamVar")
+
+               // Get query parameters
+               name := r.URL.Query().Get("queryParamVar")
+            
+               // Business Logic goes here:
+                ...
+      
+                // declare return response struct
+               var resp struct {
+                       Error   bool   `json:"error"`
+                       Message string `json:"message"`
+                       Value   string `json:"value"`
+                   }
+				   
+                resp.Error = false
+                resp.Message = "Success"
+                resp.Value = fromCache.(string)
+       
+                _ = h.App.WriteJson(w, http.StatusOk, resp)
+      } 
+       ```
