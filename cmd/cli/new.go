@@ -39,7 +39,7 @@ func doNew(appName string) {
 		exitGracefully(err)
 	}
 
-	//remove the .gitignore
+	//remove the .git dir for a clear start
 	err = os.RemoveAll(fmt.Sprintf("./%s/.git", appName))
 	if err != nil {
 		exitGracefully(err)
@@ -97,11 +97,11 @@ func doNew(appName string) {
 			exitGracefully(err)
 		}
 	}
+	// remove unused Makefile templates from the skeleton
 	_ = os.Remove("./" + appName + "/Makefile.mac")
 	_ = os.Remove("./" + appName + "/Makefile.windows")
 
 	// update the go.mod file
-
 	color.Yellow("\tcreating go.mod file...")
 	_ = os.Remove("./" + appName + "/go.mod")
 

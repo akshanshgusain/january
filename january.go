@@ -87,53 +87,6 @@ func (j *January) New(rootPath string) error {
 	j.Version = version
 	j.RootPath = rootPath
 
-	// create loggers
-	infoLog, errorLog := j.startLoggers()
-	j.ErrorLog = errorLog
-	j.InfoLog = infoLog
-
-	// create mailer
-	j.Mail = j.createMailer()
-
-	// check if redis is available
-	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
-		myRedisCache = j.createClientRedisCache()
-		j.Cache = myRedisCache
-		redisPool = myRedisCache.Conn
-	}
-
-	// set scheduler
-	scheduler := cron.New()
-	j.Scheduler = scheduler
-
-	// check if badger is available
-	if os.Getenv("CACHE") == "badger" {
-		myBadgerCache = j.createClientBadgerCache()
-		j.Cache = myBadgerCache
-		badgerConn = myBadgerCache.Conn
-
-		// garbage collection/clean up
-		_, err := j.Scheduler.AddFunc("@daily", func() {
-			_ = myBadgerCache.Conn.RunValueLogGC(0.7)
-		})
-		if err != nil {
-			return err
-		}
-	}
-
-	// connect to database
-	if os.Getenv("DATABASE_TYPE") != "" {
-		db, err := j.OpenDBConnection(os.Getenv("DATABASE_TYPE"), j.BuildDSN())
-		if err != nil {
-			errorLog.Println(err)
-			os.Exit(1)
-		}
-		j.DB = Database{
-			DataType: os.Getenv("DATABASE_TYPE"),
-			Pool:     db,
-		}
-	}
-
 	// configuration
 	j.config = configuration{
 		port:           os.Getenv("PORT"),
@@ -155,6 +108,55 @@ func (j *January) New(rootPath string) error {
 			password: os.Getenv("REDIS_PASSWORD"),
 			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
+	}
+
+	// create loggers
+	infoLog, errorLog := j.startLoggers()
+	j.ErrorLog = errorLog
+	j.InfoLog = infoLog
+
+	// create mailer
+	j.Mail = j.createMailer()
+
+	// set scheduler
+	scheduler := cron.New()
+	j.Scheduler = scheduler
+
+	// configure caches ----------------------------
+	// check if redis is available
+	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
+		myRedisCache = j.createClientRedisCache()
+		j.Cache = myRedisCache
+		redisPool = myRedisCache.Conn // we need to close conn when the Server is closed
+	}
+
+	// check if badger is available
+	if os.Getenv("CACHE") == "badger" {
+		myBadgerCache = j.createClientBadgerCache()
+		j.Cache = myBadgerCache
+		badgerConn = myBadgerCache.Conn // we need to close conn when the Server is closed
+
+		// garbage collection/clean up
+		_, err := j.Scheduler.AddFunc("@daily", func() {
+			_ = myBadgerCache.Conn.RunValueLogGC(0.7)
+		})
+		if err != nil {
+			return err
+		}
+	}
+	// configure caches ------------  ends  ---------
+
+	// connect to database
+	if os.Getenv("DATABASE_TYPE") != "" {
+		db, err := j.OpenDBConnection(os.Getenv("DATABASE_TYPE"), j.BuildDSN())
+		if err != nil {
+			errorLog.Println(err)
+			os.Exit(1)
+		}
+		j.DB = Database{
+			DataType: os.Getenv("DATABASE_TYPE"),
+			Pool:     db,
+		}
 	}
 
 	// fill in server details

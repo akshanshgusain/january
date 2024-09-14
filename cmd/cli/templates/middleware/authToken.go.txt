@@ -2,7 +2,7 @@ package middleware
 
 import "net/http"
 
-func (m *Middleware) AuthToken(next *http.Handler) http.Handler {
+func (m *Middleware) AuthToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := m.Models.Tokens.AuthenticateToken(r)
 		if err != nil {
