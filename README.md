@@ -61,6 +61,9 @@ January requires **Go version** `1.18` or **higher** to run. If you need to inst
 
 To start setting up your project download the **January-CLI** tool
 from here [January-CLI](https://github.com/akshanshgusain/january-cli/blob/master/january-cli)
+
+**Problem running [January-CLI](#troubleshooting)?**
+
 or,
 
 **Homebrew installation**: coming soon!
@@ -376,3 +379,20 @@ func (t *ModelName) Builder(id int) ([]*ModelName, error) {
 3. Automatic Swagger Documentation
 4. File system support
 5. Support for Websockets, GraphQL and gRPC
+
+## Troubleshooting
+### 🍎 Opening Unsigned Applications on macOS
+Note: You may need to change permissions.
+
+1. Go to the Apple menu (🍎) in the top-left corner of your screen.
+2. Select "System Preferences" (or "System Settings" on newer macOS versions).
+3. Click on "Security & Privacy" (or just "Privacy & Security").
+4. In the "General" tab, look for a message near the bottom that says "january-cli was blocked from use because it is not from an identified developer" (if you don't see this message, try to open the app again).
+5. Click the "Open Anyway" button next to this message. You might need to click the lock icon and enter your password to make changes.
+6. A pop-up window will appear asking if you're sure you want to open the application. Click "Open" to run the app.
+7. The app should now open, and macOS will remember your choice, allowing you to open the app normally in the future.
+
+Alternative Method: Using Terminal:
+```console
+xattr -d com.apple.quarantine /path/to/downloaded/exectable/january-cli
+```
