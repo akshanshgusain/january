@@ -13,6 +13,9 @@ coverage:
 build_cli:
 	@go build -o ../januaryApp/january-cli ./cmd/cli
 
+build_cli_desktop:
+	@go build -o ~/Desktop/january-cli ./cmd/cli
+
 count:
 	 find . -type f -name '*.go' | xargs cat | wc -l
 

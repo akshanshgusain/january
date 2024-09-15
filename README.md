@@ -38,14 +38,16 @@
 * Encryption
 * Multiple Caching backends
 
----
+
 
 
 ## 💡 Inspiration
 When teams at my organization began transitioning from Python, Node.js, and PHP to Go, we encountered a new challenge: as each developer utilized different libraries, standards, and frameworks, interoperability between teams became increasingly problematic. The January Web Framework was conceived with a "batteries-included" approach, enabling teams to swiftly integrate into the Go ecosystem while adhering to consistent standards across the organization.
 
+## 👻 What's New
+1. Built in Support for TailwindCSS.
+2. Supports DaisyUI-Components and Theme.
 
----
 ## 👾 WIP
 
 1. **Build with January/January-recipes** a repository of apps build with January framework
