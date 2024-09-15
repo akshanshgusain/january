@@ -47,12 +47,12 @@ When teams at my organization began transitioning from Python, Node.js, and PHP 
 ## 👻 What's New
 1. Built in Support for TailwindCSS.
 2. Supports DaisyUI-Components and Theme.
+3. Added Starter-APP right into the January-CLI
 
 ## 👾 WIP
 
 1. **Build with January/January-recipes** a repository of apps build with January framework
 2. **Go January Docs**: [Documentation, coming soon!](https://gojanuary.akshanshgusain.com)
-
 ---
 
 ## ⚙️ Installation

@@ -1,10 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/go-git/go-git/v5"
 	"io"
 	"log"
 	"os"
@@ -26,33 +24,40 @@ func doNew(appName string) {
 	}
 	log.Println("App name is: ", appName)
 
-	//git clone the skeleton application
-	color.Green("\tcloning repository...")
-	_, err := git.PlainClone("./"+appName, false, &git.CloneOptions{
-		URL:      "https://github.com/akshanshgusain/january_starter_app",
-		Progress: os.Stdout,
-		Depth:    1,
-	})
+	// clone the started app from the template directory
+	color.Green("\tbuilding starter app...")
 
+	err := os.MkdirAll("./"+appName, os.ModePerm)
 	if err != nil {
-		exitGracefully(errors.New("error cloning the skeleton project: "))
+		fmt.Println("Error creating app directory:", err)
+		return
+	}
+
+	err = copyFilesFromDir("templates/appTemplate", "./"+appName)
+	if err != nil {
 		exitGracefully(err)
 	}
 
-	//remove the .git dir for a clear start
-	err = os.RemoveAll(fmt.Sprintf("./%s/.git", appName))
+	//create a .gitignore file
+	color.Yellow("\tcreating .gitignore file")
+	data, err := templateFS.ReadFile("templates/gitignore.txt")
+	if err != nil {
+		exitGracefully(err)
+	}
+	env := string(data)
+	err = copyDataToFile([]byte(env), fmt.Sprintf("./%s/.gitignore", appName))
 	if err != nil {
 		exitGracefully(err)
 	}
 
 	//create a .env file
 	color.Yellow("\tcreating .env file")
-	data, err := templateFS.ReadFile("templates/env.txt")
+	data, err = templateFS.ReadFile("templates/env.txt")
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	env := string(data)
+	env = string(data)
 	env = strings.ReplaceAll(env, "${APP_NAME}", appName)
 	env = strings.ReplaceAll(env, "${KEY}", j.RandomString(32))
 
