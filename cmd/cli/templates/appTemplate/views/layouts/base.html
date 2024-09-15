@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>January: {{yield browserTitle()}}</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/public/ico/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/public/ico/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/public/ico/favicon-16x16.png">
+    <link rel="manifest" href="/public/ico/site.webmanifest">
+    <!-- DaisyUI CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <meta name="csrf-token" content="{{.CSRFToken}}">
+
+    {{yield css()}}
+
+</head>
+
+<body>
+<div class="font-sans">
+    {{yield pageContent()}}
+</div>
+<script src="https://cdn.tailwindcss.com"></script>
+{{yield js()}}
+
+</body>
+
+</html>

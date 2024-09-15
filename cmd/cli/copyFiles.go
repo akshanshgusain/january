@@ -3,8 +3,10 @@ package main
 import (
 	"embed"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 //go:embed templates
@@ -42,4 +44,43 @@ func fileExists(fileToCheck string) bool {
 		return false
 	}
 	return true
+}
+
+// New function to copy all files from a directory
+func copyFilesFromDir(sourceDir string, targetDir string) error {
+	entries, err := templateFS.ReadDir(sourceDir)
+	if err != nil {
+		return fmt.Errorf("error reading source directory from templateFS: %w", err)
+	}
+
+	for _, entry := range entries {
+		sourcePath := filepath.Join(sourceDir, entry.Name())
+		targetPath := filepath.Join(targetDir, entry.Name())
+
+		if entry.IsDir() {
+			// Create the target directory if it doesn't exist
+			err = os.MkdirAll(targetPath, os.ModePerm)
+			if err != nil {
+				return fmt.Errorf("error creating directory %s: %w", targetPath, err)
+			}
+
+			// Recursively call copyFilesFromDir for subdirectories
+			err = copyFilesFromDir(sourcePath, targetPath)
+			if err != nil {
+				return err
+			}
+		} else {
+			data, err := templateFS.ReadFile(sourcePath)
+			if err != nil {
+				return fmt.Errorf("error reading file from templateFS: %w", err)
+			}
+
+			err = copyDataToFile(data, targetPath)
+			if err != nil {
+				return fmt.Errorf("error copying data to file: %w", err)
+			}
+		}
+	}
+
+	return nil
 }
