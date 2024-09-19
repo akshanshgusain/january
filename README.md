@@ -6,16 +6,11 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/fastapi/fastapi/actions?query=workflow%3ATest+event%3Apush+branch%3Amaster" target="_blank">
-    <img src="https://github.com/fastapi/fastapi/workflows/Test/badge.svg?event=push&branch=master" alt="Test">
-</a>
-<a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/fastapi" target="_blank">
-    <img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/fastapi.svg" alt="Coverage">
-</a>
+
 <a href="">
     <img src="https://img.shields.io/badge/january-docs-blue" alt="January Docs">
 </a>
-<a href="https://pypi.org/project/fastapi" target="_blank">
+<a href="https://tip.golang.org/doc/go1.18" target="_blank">
     <img src="https://img.shields.io/github/go-mod/go-version/akshanshgusain/january" alt="Supported Go versions">
 </a>
 </p>
