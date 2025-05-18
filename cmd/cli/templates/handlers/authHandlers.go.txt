@@ -29,7 +29,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
 
-	user, err := h.Models.Users.GetByEmail(email)
+	user, err := h.Models.User.GetByEmail(email)
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return

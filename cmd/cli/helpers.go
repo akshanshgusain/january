@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 )
 
 func setup(arg1, arg2 string) {
@@ -94,6 +95,10 @@ func exitGracefully(e error, msg ...string) {
 }
 
 func updateSourceFiles(path string, fi os.FileInfo, err error) error {
+	if appURL != "" {
+		appName = appURL
+	}
+
 	// check for an error before doing anything else
 	if err != nil {
 		return err
@@ -110,6 +115,33 @@ func updateSourceFiles(path string, fi os.FileInfo, err error) error {
 		return err
 	}
 
+	// also check for Makefile
+	makefileMatched, err := filepath.Match("Makefile", fi.Name())
+	if err != nil {
+		return err
+	}
+
+	if strings.Contains(appURL, "/") {
+		exploded := strings.SplitAfter(appURL, "/")
+		appName = exploded[(len(exploded) - 1)]
+	}
+
+	if makefileMatched {
+		// read file contents
+		read, err := os.ReadFile(path)
+		if err != nil {
+			exitGracefully(err)
+		}
+
+		newContents := strings.Replace(string(read), "januaryApp", appName, -1)
+
+		// write the changed file
+		err = os.WriteFile(path, []byte(newContents), 0)
+		if err != nil {
+			exitGracefully(err)
+		}
+	}
+
 	// we have a matching file
 	if matched {
 		// read file contents
@@ -117,8 +149,8 @@ func updateSourceFiles(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			exitGracefully(err)
 		}
-
 		newContents := strings.Replace(string(read), "januaryApp", appURL, -1)
+		newContents = strings.Replace(newContents, "*APP_NAME*", appName, -1)
 
 		// write the changed file
 		err = os.WriteFile(path, []byte(newContents), 0)

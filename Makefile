@@ -24,4 +24,8 @@ count_all:
 
 build:
 	@go build -o ./dist/january ./cmd/cli
-	cp ./dist/january ~/GolandProjects/januaryFramework/january_execuatable
+	cp ./dist/january ~/Downloads/
+
+build_in_srv:
+	@go build -o ./dist/january ./cmd/cli
+	cp ./dist/january ~/Downloads/my_crud_srv/

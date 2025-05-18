@@ -1,14 +1,49 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/fatih/color"
+	"os"
+	"strings"
 	"time"
 )
 
+var appName string
+
+func extractAppName() string {
+	file, err := os.Open("go.mod")
+	if err != nil {
+		exitGracefully(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "module ") {
+			moduleName := strings.TrimSpace(strings.TrimPrefix(line, "module"))
+			return moduleName
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		exitGracefully(err)
+	} else {
+		exitGracefully(fmt.Errorf("No module declaration found in go.mod"))
+	}
+
+	return ""
+}
+
 func doAuth() error {
+	// extract the appName from go.mod
+	appName = extractAppName()
+	appURL = appName
+
 	// create migrations
 	dbType := j.DB.DataType
+
 	fileName := fmt.Sprintf("%d_create_auth_tables", time.Now().UnixMicro())
 	upFile := j.RootPath + "/migrations/" + fileName + ".up.sql"
 	downFile := j.RootPath + "/migrations/" + fileName + ".down.sql"
@@ -67,6 +102,20 @@ func doAuth() error {
 		exitGracefully(err)
 	}
 
+	color.Green("changing auth")
+	updateSource()
+
+	//data, err := templateFS.ReadFile("templates/handlers/authHandlers.go.txt")
+	//if err != nil {
+	//	exitGracefully(err)
+	//}
+	//handler := string(data)
+	//handler = strings.ReplaceAll(handler, "$APP_NAME$", appURL)
+	//err = ioutil.WriteFile(j.RootPath+"/handlers/authHandlers.go", []byte(handler), 0644)
+	//if err != nil {
+	//	exitGracefully(err)
+	//}
+
 	// copy views
 
 	// views-mailer
@@ -86,7 +135,7 @@ func doAuth() error {
 		exitGracefully(err)
 	}
 
-	err = copyFileFromTemplate("templates/views/forget.jet", j.RootPath+"/views/forgot.jet")
+	err = copyFileFromTemplate("templates/views/forgot.jet", j.RootPath+"/views/forgot.jet")
 	if err != nil {
 		exitGracefully(err)
 	}
@@ -96,11 +145,13 @@ func doAuth() error {
 		exitGracefully(err)
 	}
 
+	//updateSource()
+
 	color.Yellow("   - users, tokens, and remember_tokens migrations created and executed")
 	color.Yellow("   - user and tokens models created")
 	color.Yellow("   - auth middleware created")
 	color.Yellow("")
-	color.Yellow("Don't forget to add user and token models in data/models.go, and to add appropriate middleware to your routes!")
+	color.Yellow("Don't forget to add user, token and remember_token models in data/models.go, and to add appropriate middleware to your routes!")
 
 	return nil
 }

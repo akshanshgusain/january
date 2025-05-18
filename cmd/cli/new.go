@@ -21,6 +21,7 @@ func doNew(appName string) {
 	if strings.Contains(appName, "/") {
 		exploded := strings.SplitAfter(appName, "/")
 		appName = exploded[(len(exploded) - 1)]
+		j.AppName = appName
 	}
 	log.Println("App name is: ", appName)
 

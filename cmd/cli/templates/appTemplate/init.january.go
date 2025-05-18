@@ -22,7 +22,7 @@ func initApplication() *application {
 		log.Fatal(err)
 	}
 
-	jan.AppName = "jan_app"
+	jan.AppName = "januaryApp"
 
 	mid := &middleware.Middleware{
 		App: jan,
@@ -38,6 +38,9 @@ func initApplication() *application {
 		Handlers:   h,
 		Middleware: mid,
 	}
+
+	// apply middlewares here:
+	//app.App.Routes.Use(mid.yourMiddleware)
 
 	// init Routes
 	app.App.Routes = app.routes()

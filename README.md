@@ -7,7 +7,7 @@
 
 <p align="center">
 
-<a href="">
+<a href="https://gojanuary.akshanshgusain.com/">
     <img src="https://img.shields.io/badge/january-docs-blue" alt="January Docs">
 </a>
 <a href="https://tip.golang.org/doc/go1.18" target="_blank">
@@ -16,6 +16,9 @@
 </p>
 
 ---
+
+Docs: https://gojanuary.akshanshgusain.com/
+Website: https://gojanuary.framer.website/
 
 ## 🎯 Features
 
