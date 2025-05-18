@@ -1,5 +1,5 @@
 <p align="center">
-  <a href=""><img src="https://github.com/akshanshgusain/january/blob/master/media/logo_dark.png?raw=true" alt="January"></a>
+  <a href="https://gojanuary.framer.website/" target="_blank"><img src="https://github.com/akshanshgusain/january/blob/master/media/logo_dark.png?raw=true" alt="January"></a>
 </p>
 <p align="center">
     <em>January is Batteries-Included Go Framework inspired by Django. Designed to ease things up for fast development.</em>
