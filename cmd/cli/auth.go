@@ -130,17 +130,17 @@ func doAuth() error {
 	}
 
 	// views - views
-	err = copyFileFromTemplate("templates/views/login.jet", j.RootPath+"/views/login.jet")
+	err = copyFileFromTemplate("templates/views/login.jet", j.RootPath+"/views/login.html")
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	err = copyFileFromTemplate("templates/views/forgot.jet", j.RootPath+"/views/forgot.jet")
+	err = copyFileFromTemplate("templates/views/forgot.jet", j.RootPath+"/views/forgot.html")
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	err = copyFileFromTemplate("templates/views/reset-password.jet", j.RootPath+"/views/reset-password.jet")
+	err = copyFileFromTemplate("templates/views/reset-password.jet", j.RootPath+"/views/reset-password.html")
 	if err != nil {
 		exitGracefully(err)
 	}
