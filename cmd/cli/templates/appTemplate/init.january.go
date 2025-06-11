@@ -43,7 +43,7 @@ func initApplication() *application {
 	//app.App.Routes.Use(mid.yourMiddleware)
 
 	// init Routes
-	app.App.Routes = app.routes()
+	app.App.Routes = app.defaultRoutes()
 
 	// init Models
 	app.Models = data.New(app.App.DB.Pool)

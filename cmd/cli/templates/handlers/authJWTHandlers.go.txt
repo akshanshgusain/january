@@ -1,0 +1,122 @@
+package handlers
+
+import (
+	"fmt"
+	"net/http"
+)
+
+type CreateUserDTO struct {
+	ID        int    `json:"id,omitempty"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Active    int    `json:"user_active"`
+	Password  string `json:"password"`
+}
+
+func (u *CreateUserDTO) ToDomain() data.User {
+	usr := data.User{
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+		Email:     u.Email,
+		Active:    u.Active,
+		Password:  u.Password,
+	}
+	return usr
+}
+
+type LoginUserDTO struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (h *Handlers) UserSignup(w http.ResponseWriter, r *http.Request) {
+
+	createUserDto := CreateUserDTO{}
+
+	err := h.rawBody(r, &createUserDto)
+	if err != nil {
+		ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user := createUserDto.ToDomain()
+
+	// check if user already exists
+	existingUser, err := h.Models.User.GetByEmail(user.Email)
+
+	if existingUser != nil {
+		ResponseJSON(w, http.StatusConflict, fmt.Sprintf("user with email:%s already exists", user.Email))
+		return
+	}
+
+	user.ID, err = h.Models.User.Insert(user)
+
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, "error inserting user")
+		return
+	}
+
+	// generate token jwt
+	token, err := h.Models.TokenJWT.GenerateToken(user.ID, 3)
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, "error generating token")
+		return
+	}
+
+	// save token
+	err = h.Models.TokenJWT.Insert(*(token), user)
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, "error generating token")
+		return
+	}
+
+	ResponseJSON(w, http.StatusCreated, token)
+}
+
+func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
+	loginDto := LoginUserDTO{}
+	err := h.rawBody(r, &loginDto)
+	if err != nil {
+		ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	user, err := h.Models.User.GetByEmail(loginDto.Email)
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, "error getting user")
+		return
+	}
+	if user == nil {
+		ResponseJSON(w, http.StatusNotFound, "no user with this email found")
+		return
+	}
+
+	// match password
+	res, err := user.PasswordMatches(loginDto.Password)
+	if err != nil {
+		fmt.Println(err)
+		ResponseJSON(w, http.StatusInternalServerError, "error checking password")
+		return
+	}
+	if !res {
+		ResponseJSON(w, http.StatusUnauthorized, "wrong password")
+		return
+	}
+
+	// generate token jwt
+	token, err := h.Models.TokenJWT.GenerateToken(user.ID, 3)
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, "error generating token")
+		return
+	}
+
+	// save token
+	err = h.Models.TokenJWT.Insert(*(token), *user)
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, "error generating token")
+		return
+	}
+
+	ResponseJSON(w, http.StatusCreated, token)
+
+}

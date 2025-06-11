@@ -31,6 +31,29 @@ func copyFileFromTemplate(templatePath string, targetFile string) error {
 	return nil
 }
 
+func appendFileFromTemplate(templatePath string, targetFile string) error {
+	// Read the template file
+	data, err := templateFS.ReadFile(templatePath)
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	// Open the target file in append mode
+	f, err := os.OpenFile(targetFile, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// Append the template contents
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func copyDataToFile(data []byte, to string) error {
 	err := ioutil.WriteFile(to, data, 0644)
 	if err != nil {
