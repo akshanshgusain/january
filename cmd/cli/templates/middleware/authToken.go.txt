@@ -1,20 +1,32 @@
 package middleware
 
-import "net/http"
+import (
+	"context"
+	"fmt"
+	"net/http"
+)
 
 func (m *Middleware) AuthToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := m.Models.Token.AuthenticateToken(r)
+		user, err := m.Models.TokenJWT.AuthenticateToken(r)
 		if err != nil {
+			fmt.Println(err)
 			var payload struct {
 				Error   bool   `json:"error"`
 				Message string `json:"message"`
+				Summary string `json:"summary"`
 			}
 			payload.Error = true
 			payload.Message = "invalid authentication credentials"
+			payload.Summary = err.Error()
 
 			_ = m.App.WriteJson(w, http.StatusUnauthorized, payload)
+			return
 		}
 
+		// Add the authenticated user to the request context
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, "user", user)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

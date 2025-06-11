@@ -1,0 +1,7 @@
+func (h *Handlers) getDecodedToken(r *http.Request) (*data.User, error) {
+	user, ok := r.Context().Value("user").(*data.User)
+	if !ok {
+		return nil, errors.New("User not found in context")
+	}
+	return user, nil
+}

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (a *application) routes() *chi.Mux {
+func (a *application) defaultRoutes() *chi.Mux {
 	// middlewares
 
 	// routes

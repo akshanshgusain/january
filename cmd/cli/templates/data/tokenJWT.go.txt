@@ -1,0 +1,221 @@
+package data
+
+import (
+	"errors"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	up "github.com/upper/db/v4"
+)
+// TODO: replace with your own secret key
+var secretKey = []byte("45ce5900a32014144af0cb59ae175cdecd81a67e8358d5b8858d0d957d24d5c0340ed9b83253f43c2466f840191c91ef50f1c8eae5007f320762399338c090fd0cbd30cad613f588cca75114c9eacc22f4092b8004d34d46b65475820e48435b1fdf16910112b74d35b38630a16a75d3a887bad167e74e50d53c9722e11fbfbff3e14d0362b2f7ad97dcd69c970c553ef8865552d019b831edcd783355ca37677de86f08cc2abaef5eec1de2b2ed4c32c7a7b36fbacf10cf7f16f424feacda932af1c57e139a9f5e614be08814ab6cae615f54a6a199619cb955321dd19caee09b1c4bee97cf03e9b9f5c085b6e58b13271b5d192408b070d5c69f046045f908")
+
+type TokenJWT struct {
+	ID        int       `db:"id,omitempty" json:"id"`
+	UserID    int       `db:"user_id" json:"user_id"`
+	FirstName string    `db:"first_name" json:"first_name"`
+	Email     string    `db:"email" json:"email"`
+	Token     string    `db:"token" json:"token"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	Expires   time.Time `db:"expiry" json:"expiry"`
+}
+
+// CustomClaims represents the JWT claims
+type CustomClaims struct {
+	UserID    int    `json:"user_id"`
+	FirstName string `json:"first_name"`
+	Email     string `json:"email"`
+	jwt.RegisteredClaims
+}
+
+func (t *TokenJWT) Table() string {
+	return "tokens_jwt"
+}
+
+func (t *TokenJWT) GetUserForToken(tokenString string) (*User, error) {
+	// Parse and validate the JWT token
+	claims := &CustomClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	// Get user from database using claims
+	var u User
+	collection := upper.Collection("users")
+	res := collection.Find(up.Cond{"id": claims.UserID})
+	err = res.One(&u)
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
+}
+
+func (t *TokenJWT) GetTokensForUser(id int) ([]*TokenJWT, error) {
+	var tokens []*TokenJWT
+	collection := upper.Collection(t.Table())
+	res := collection.Find(up.Cond{"user_id": id})
+	err := res.All(&tokens)
+	if err != nil {
+		return nil, err
+	}
+
+	return tokens, nil
+}
+
+func (t *TokenJWT) Get(id int) (*TokenJWT, error) {
+	var token TokenJWT
+	collection := upper.Collection(t.Table())
+	res := collection.Find(up.Cond{"id": id})
+	err := res.One(&token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &token, nil
+}
+
+func (t *TokenJWT) GetByToken(tokenString string) (*TokenJWT, error) {
+	var token TokenJWT
+	collection := upper.Collection(t.Table())
+	res := collection.Find(up.Cond{"token": tokenString})
+	err := res.One(&token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &token, nil
+}
+
+func (t *TokenJWT) Delete(id int) error {
+	collection := upper.Collection(t.Table())
+	res := collection.Find(id)
+	err := res.Delete()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *TokenJWT) DeleteByToken(tokenString string) error {
+	collection := upper.Collection(t.Table())
+	res := collection.Find(up.Cond{"token": tokenString})
+	err := res.Delete()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *TokenJWT) Insert(token TokenJWT, u User) error {
+	collection := upper.Collection(t.Table())
+
+	// delete existing tokens
+	res := collection.Find(up.Cond{"user_id": u.ID})
+	err := res.Delete()
+	if err != nil {
+		return err
+	}
+
+	token.CreatedAt = time.Now()
+	token.UpdatedAt = time.Now()
+	token.FirstName = u.FirstName
+	token.Email = u.Email
+
+	_, err = collection.Insert(token)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *TokenJWT) GenerateToken(userID int, ttl time.Duration) (*TokenJWT, error) {
+	// Create the Claims
+	expiry := time.Now().Add(time.Hour * ttl)
+
+	claims := CustomClaims{
+		UserID:    userID,
+		FirstName: t.FirstName,
+		Email:     t.Email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiry),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	// Create token with claims
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TokenJWT{
+		UserID:    userID,
+		FirstName: t.FirstName,
+		Email:     t.Email,
+		Token:     tokenString,
+		Expires:   expiry,
+	}, nil
+}
+
+func (t *TokenJWT) AuthenticateToken(r *http.Request) (*User, error) {
+	authorizationHeader := r.Header.Get("Authorization")
+	if authorizationHeader == "" {
+		return nil, errors.New("no authorization header received")
+	}
+
+	headerParts := strings.Split(authorizationHeader, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		return nil, errors.New("invalid authorization header format")
+	}
+
+	tokenString := headerParts[1]
+	re := t.Exists(tokenString)
+	if re {
+		return t.GetUserForToken(tokenString)
+	} else {
+		return nil, errors.New("token not found")
+	}
+}
+
+func (t *TokenJWT) Exists(tokenString string) bool {
+	collection := upper.Collection(t.Table())
+	res := collection.Find(up.Cond{"token": tokenString})
+	exists, err := res.Exists()
+	if err != nil {
+		return false
+	}
+	return exists
+
+}
+
+func (t *TokenJWT) ValidToken(tokenString string) (bool, error) {
+	claims := &CustomClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	return token.Valid, nil
+}
