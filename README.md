@@ -17,8 +17,6 @@
 
 ---
 
-Docs: https://gojanuary.akshanshgusain.com/ \
-Website: https://gojanuary.framer.website/
 
 ## 🎯 Features
 
